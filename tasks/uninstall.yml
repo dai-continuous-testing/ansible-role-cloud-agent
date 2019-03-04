@@ -4,6 +4,7 @@
   with_items:
   - installation_folder
   - service_plist_file_path
+  - temp_folder
 
 - name: stop the service
   command: "launchctl unload {{ service_plist_file_path }}"
@@ -19,3 +20,8 @@
     path: "{{ installation_folder }}"
     state: absent
   become: yes
+
+- name: remove temp folder
+  file:
+    path: "{{ temp_folder }}"
+    state: absent

@@ -5,7 +5,8 @@ app_name: cloudagent
 service_name: "com.experitest.{{ app_name }}"
 service_plist_file_path: "/Library/LaunchDaemons/{{ service_name }}.plist"
 
-temp_folder: "/tmp"
+temp_folder: "/tmp/_experitest/"
+clear_temp_folder: False
 
 s3_bucket_name: seetest-io-build-artifacts
 
@@ -15,3 +16,7 @@ server_port: 8081
 jmx_port: 51234
 
 start_after_install: True
+
+clear_installation_folder_before_install: False
+
+download_from_s3: True

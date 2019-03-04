@@ -5,3 +5,11 @@ app_version: "12.3.866"
 installer_file_name: "{{ app_name }}_{{ app_version }}.zip"
 
 installation_folder: "{{ ansible_user_dir }}/experitest/{{ app_name }}-{{ app_version }}"
+
+# 
+# customizing download file url
+# to come from url
+# works along with the property:
+# download_from_s3: True
+# 
+custom_download_url:

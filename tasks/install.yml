@@ -4,12 +4,26 @@
   with_items:
   - app_name
   - temp_folder
+  - clear_temp_folder
   - service_name
   - installation_folder
-  - s3_bucket_name
+  - clear_installation_folder_before_install
   - server_port
   - service_plist_file_path
   - installer_file_name
+  - download_from_s3
+  - s3_bucket_name
+
+- name: assert all vars are set
+  assert: { that: "{{ item }} != '' " }
+  with_items:
+  - custom_download_url
+  when: download_from_s3 == False
+
+- name: make sure temp folder exists
+  file:
+    path: "{{ temp_folder }}"
+    state: directory
 
 - name: download zip from s3
   aws_s3:
@@ -18,11 +32,24 @@
     dest: "{{ temp_folder }}/{{ installer_file_name }}"
     overwrite: different
     mode: get
+  when: download_from_s3 != False
+
+- name: download zip from url
+  get_url:
+    url: "{{ custom_download_url }}"
+    dest: "{{ temp_folder }}/{{ installer_file_name }}"
+  when: download_from_s3 == False
 
 - name: stop the old service
   command: "launchctl unload {{ service_plist_file_path }}"
   become: yes
   ignore_errors: yes
+
+- name: clear old installation folder
+  file: 
+    path: "{{ installation_folder }}"
+    state: absent
+  when: clear_installation_folder_before_install == True
 
 - name: make sure installation folder exists
   file:
@@ -74,3 +101,9 @@
   command: "launchctl load {{ service_plist_file_path }}"
   become: yes
   when: start_after_install is defined and start_after_install == True
+
+- name: clear temp folder
+  file:
+    path: "{{ temp_folder }}"
+    state: absent
+  when: clear_temp_folder == True
