@@ -1,0 +1,21 @@
+
+- name: assert all vars are set
+  assert: { that: "{{ item }} != '' " }
+  with_items:
+  - installation_folder
+  - service_plist_file_path
+
+- name: stop the service
+  command: "launchctl unload {{ service_plist_file_path }}"
+
+- name: remove the service
+  file:
+    path: "{{ service_plist_file_path }}"
+    state: absent
+  become: yes
+
+- name: remove the application folder
+  file:
+    path: "{{ installation_folder }}"
+    state: absent
+  become: yes

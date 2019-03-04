@@ -1,0 +1,17 @@
+---
+
+app_name: cloudagent
+
+service_name: "com.experitest.{{ app_name }}"
+service_plist_file_path: "/Library/LaunchDaemons/{{ service_name }}.plist"
+
+temp_folder: "/tmp"
+
+s3_bucket_name: seetest-io-build-artifacts
+
+main_class: "com.experitest.cloudagent.MainForwarder"
+
+server_port: 8081
+jmx_port: 51234
+
+start_after_install: True

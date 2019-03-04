@@ -1,0 +1,76 @@
+
+- name: assert all vars are set
+  assert: { that: "{{ item }} != '' " }
+  with_items:
+  - app_name
+  - temp_folder
+  - service_name
+  - installation_folder
+  - s3_bucket_name
+  - server_port
+  - service_plist_file_path
+  - installer_file_name
+
+- name: download zip from s3
+  aws_s3:
+    bucket: "{{ s3_bucket_name }}"
+    object: "{{ installer_file_name }}"
+    dest: "{{ temp_folder }}/{{ installer_file_name }}"
+    overwrite: different
+    mode: get
+
+- name: stop the old service
+  command: "launchctl unload {{ service_plist_file_path }}"
+  become: yes
+  ignore_errors: yes
+
+- name: make sure installation folder exists
+  file:
+    path: "{{ installation_folder }}"
+    state: directory
+
+- name: unzip the file
+  unarchive:
+    src: "{{ temp_folder }}/{{ installer_file_name }}"
+    dest: "{{ installation_folder }}"
+    remote_src: yes
+
+- name: copy plist
+  template:
+    src: service.plist.j2
+    dest: "{{ service_plist_file_path }}"
+  become: yes
+
+- name: copy start script
+  template:
+    src: start.sh.j2
+    dest: "{{ installation_folder }}/start.sh"
+    mode: 0755
+
+- name: update application properties file
+  lineinfile:
+    path: "{{ installation_folder }}/conf/application.properties"
+    line: "server.port={{ server_port }}"
+
+- name: update server port
+  lineinfile:
+    state: present
+    path: "{{ installation_folder }}/conf/cloudagent.conf.xml"
+    line: "<main-port>{{ server_port }}</main-port>"
+    regexp: "<main-port>\\d*<\\/main-port>"
+
+- name: set permissions for logs folder
+  file:
+    path: "{{ installation_folder }}/logs"
+    state: directory
+    mode: 0777
+
+- name: reset pairing key
+  file:
+    path: "{{ installation_folder }}/conf/pairing.conf.xml"
+    state: absent
+
+- name: load the service
+  command: "launchctl load {{ service_plist_file_path }}"
+  become: yes
+  when: start_after_install is defined and start_after_install == True
