@@ -1,31 +1,32 @@
-Role Name
+Experitest - Cloud Agent ansible role
 =========
 
-A brief description of the role goes here.
+This role will install \ uninstall cloud agent for mac os hosts
 
 Requirements
 ------------
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+This role assumes that you have java 8 installed on the instance
+Supports mac os hosts only.
 
 Role Variables
 --------------
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
-
-Dependencies
-------------
-
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+Role variables are as following:
+  - app_version: set application version
+  - installation_folder: set alternative installation location
+  - custom_download_url: works with "download_from_s3: False". provides alternative url to download the zip file
+  - state: present \ absent
+  - server_port: port number for the process listen to
 
 Example Playbook
 ----------------
 
 Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
 
-    - hosts: servers
+    - hosts: cloud-agents
       roles:
-         - { role: username.rolename, x: 42 }
+         - { role: experitest.cloud-agent, state: present }
 
 License
 -------
@@ -35,4 +36,3 @@ BSD
 Author Information
 ------------------
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).

@@ -1,3 +1,4 @@
+# validation
 
 - name: assert all vars are set
   assert: { that: "{{ item }} != '' " }
@@ -20,6 +21,8 @@
   - custom_download_url
   when: download_from_s3 == False
 
+# download the file
+
 - name: make sure temp folder exists
   file:
     path: "{{ temp_folder }}"
@@ -40,16 +43,22 @@
     dest: "{{ temp_folder }}/{{ installer_file_name }}"
   when: download_from_s3 == False
 
+# stop old service
+
 - name: stop the old service
   command: "launchctl unload {{ service_plist_file_path }}"
   become: yes
   ignore_errors: yes
+
+# delete old installation (optional)
 
 - name: clear old installation folder
   file: 
     path: "{{ installation_folder }}"
     state: absent
   when: clear_installation_folder_before_install == True
+
+# unpack all the files to the installation folder
 
 - name: make sure installation folder exists
   file:
@@ -74,6 +83,8 @@
     dest: "{{ installation_folder }}/start.sh"
     mode: 0755
 
+# configure installed 
+
 - name: update application properties file
   lineinfile:
     path: "{{ installation_folder }}/conf/application.properties"
@@ -97,10 +108,14 @@
     path: "{{ installation_folder }}/conf/pairing.conf.xml"
     state: absent
 
+# start the service (optional)
+
 - name: load the service
   command: "launchctl load {{ service_plist_file_path }}"
   become: yes
   when: start_after_install is defined and start_after_install == True
+
+# clear temp files (optional)
 
 - name: clear temp folder
   file:
