@@ -2,7 +2,7 @@ galaxy_info:
   role_name: cloud_agent
   author: Shai Atias
   description: DevOps Team
-  company: Experitest Ltd
+  company: Experitest, Ltd.
 
   # If the issue tracker for your role is not on github, uncomment the
   # next line and provide a value
