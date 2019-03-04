@@ -22,9 +22,11 @@ Role variables are as following:
 Example Playbook
 ----------------
 
+#### [see working example](/blob/master/examples/README.md)
+
 In requirements.yml file
 
-    - src: git+https://github.com:ExperitestOfficial/ansible-role-cloud-agent.git
+    - src: git+https://github.com/ExperitestOfficial/ansible-role-cloud-agent.git
       version: master
       name: cloud-agent
 
@@ -33,9 +35,9 @@ In site.yml file
 
     - hosts: cloud-agents
       roles:
-          - role: cloud-agent
-            state: present
-            app_version: 1.2.3
+        - role: cloud-agent
+          state: present
+          app_version: 1.2.3
 
 To invoke, run the following commands:
 

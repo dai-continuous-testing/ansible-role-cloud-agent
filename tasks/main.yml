@@ -5,10 +5,10 @@
     msg: "this role only supports mac os"
   when: ansible_os_family != "Darwin"
 
-- name: Install cloud agent
+- name: install cloud agent
   include_tasks: tasks/install.yml
   when: state|default('present') == 'present'
 
-- name: Uninstall cloud agent
+- name: uninstall cloud agent
   include_tasks: tasks/uninstall.yml
   when: state|default('present') == 'absent'
