@@ -22,7 +22,7 @@ Role variables are as following:
 Example Playbook
 ----------------
 
-#### [see working example](/blob/master/examples/README.md)
+#### [see working example](/example)
 
 In requirements.yml file
 
