@@ -1,4 +1,5 @@
 galaxy_info:
+  role_name: cloud_agent
   author: Shai Atias
   description: DevOps Team
   company: Experitest Ltd
@@ -35,11 +36,8 @@ galaxy_info:
   # To view available platforms and versions (or releases), visit:
   # https://galaxy.ansible.com/api/v1/platforms/
   #
-  platforms:
-  - name: Darwin
-    versions:
-    - all
-
+  platforms: []
+  
   galaxy_tags: 
     - mobile
     - experitest
