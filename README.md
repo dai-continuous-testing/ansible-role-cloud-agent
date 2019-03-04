@@ -22,11 +22,29 @@ Role variables are as following:
 Example Playbook
 ----------------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+In requirements.yml file
+
+    - src: git+https://github.com:shaiatias/ansible-role-cloud-agent.git
+      version: master
+      name: cloud-agent
+
+
+In site.yml file
 
     - hosts: cloud-agents
       roles:
-         - { role: experitest.cloud-agent, state: present }
+          - role: cloud-agent
+            state: present
+            app_version: 1.2.3
+
+To invoke, run the following commands:
+
+- install dependencies \
+  *ansible-galaxy install -r requirements.yml*
+
+- run the playbook \
+  *ansible-playbook site.yml*
+
 
 License
 -------
