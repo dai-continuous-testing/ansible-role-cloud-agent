@@ -24,7 +24,7 @@ Example Playbook
 
 In requirements.yml file
 
-    - src: git+https://github.com:shaiatias/ansible-role-cloud-agent.git
+    - src: git+https://github.com:ExperitestOfficial/ansible-role-cloud-agent.git
       version: master
       name: cloud-agent
 
