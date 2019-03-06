@@ -1,5 +1,13 @@
 
 - hosts: cloud-agents
+
+  pre_tasks:
+    
+    # requirement to download from s3
+    - pip:
+        name: ['botocore', 'boto3']
+      become: yes
+
   roles:
     - role: cloud-agent
       state: present
