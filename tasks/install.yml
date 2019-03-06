@@ -15,6 +15,7 @@
   - installer_file_name
   - download_from_s3
   - s3_bucket_name
+  - ansible_user_id
 
 - name: assert all vars are set
   assert: { that: "{{ item }} != '' " }
@@ -65,18 +66,23 @@
   file:
     path: "{{ installation_folder }}"
     state: directory
+    owner: "{{ ansible_user_id }}"
+  become: yes
 
 - name: unzip the file
   unarchive:
     src: "{{ temp_folder }}/{{ installer_file_name }}"
     dest: "{{ installation_folder }}"
     remote_src: yes
+    owner: "{{ ansible_user_id }}"
   become: yes
 
 - name: copy plist
   template:
     src: service.plist.j2
     dest: "{{ service_plist_file_path }}"
+    # in mac - plist owner is root
+    owner: root
   become: yes
 
 - name: copy start script
@@ -84,6 +90,8 @@
     src: start.sh.j2
     dest: "{{ installation_folder }}/start.sh"
     mode: 0755
+    owner: "{{ ansible_user_id }}"
+  become: yes
 
 # configure installed 
 
@@ -104,11 +112,14 @@
     path: "{{ installation_folder }}/logs"
     state: directory
     mode: 0777
+    owner: "{{ ansible_user_id }}"
+  become: yes
 
 - name: reset pairing key
   file:
     path: "{{ installation_folder }}/conf/pairing.conf.xml"
     state: absent
+  become: yes
 
 # start the service (optional)
 
