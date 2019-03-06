@@ -8,6 +8,7 @@
 
 - name: stop the service
   command: "launchctl unload {{ service_plist_file_path }}"
+  become: yes
 
 - name: remove the service
   file:
