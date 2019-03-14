@@ -26,16 +26,16 @@ Example Playbook
 
 In requirements.yml file
 
-    - src: git+https://github.com/ExperitestOfficial/ansible-role-cloud-agent-osx.git
+    - src: git+https://github.com/ExperitestOfficial/ansible-role-cloud-agent.git
       version: master
-      name: cloud-agent-osx
+      name: cloud-agent
 
 
 In site.yml file
 
     - hosts: cloud-agents
       roles:
-        - role: cloud-agent-osx
+        - role: cloud-agent
           state: present
           app_version: 12.3.866
 
