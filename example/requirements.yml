@@ -1,4 +1,4 @@
 
-- src: git+https://github.com/ExperitestOfficial/ansible-role-cloud-agent.git
+- src: git+https://github.com/ExperitestOfficial/ansible-role-cloud-agent-osx.git
   version: master
-  name: cloud-agent
+  name: cloud-agent-osx
