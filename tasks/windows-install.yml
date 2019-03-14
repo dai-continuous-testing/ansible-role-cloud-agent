@@ -5,17 +5,15 @@
   assert: { that: "{{ item }} != '' " }
   with_items:
   - app_name
-  - temp_folder
   - clear_temp_folder
   - service_name
   - installation_folder
   - clear_installation_folder_before_install
   - server_port
-  - service_plist_file_path
+  - service_name
   - installer_file_name
   - download_from_s3
   - s3_bucket_name
-  - ansible_user_id
 
 - name: assert all vars are set
   assert: { that: "{{ item }} != '' " }
@@ -23,24 +21,48 @@
   - custom_download_url
   when: download_from_s3 == False
 
+# set temp folder
+
+- name: Create temporary build directory
+  win_tempfile:
+    state: directory
+    suffix: "{{ app_name }}"
+  register: temp_folder_command
+
+- name: register tempfolder
+  set_fact:
+    temp_folder: temp_folder_command.path
+
 # download the file
 
 - name: make sure temp folder exists
-  file:
+  win_file:
     path: "{{ temp_folder }}"
     state: directory
 
 - name: download zip from s3
-  aws_s3:
-    bucket: "{{ s3_bucket_name }}"
-    object: "{{ installer_file_name }}"
-    dest: "{{ temp_folder }}/{{ installer_file_name }}"
-    overwrite: different
-    mode: get
+  block:
+
+    - name: try with aws cli
+      get_url:
+        bucket: "{{ s3_bucket_name }}"
+        object: "{{ installer_file_name }}"
+        dest: "{{ temp_folder }}/{{ installer_file_name }}"
+        overwrite: different
+        mode: get
+      register: command1
+      ignore_errors: True
+
+    - name: try with url
+      get_url:
+        url: "https://s3.{{ s3_region }}.amazonaws.com/{{ s3_bucket_name }}/{{ installer_file_name }}"
+        dest: "{{ temp_folder }}/{{ installer_file_name }}"
+      when: command1.rc != 0 # try when previous failed
+
   when: download_from_s3 != False
 
 - name: download zip from url
-  get_url:
+  win_get_url:
     url: "{{ custom_download_url }}"
     dest: "{{ temp_folder }}/{{ installer_file_name }}"
   when: download_from_s3 == False
@@ -48,14 +70,15 @@
 # stop old service
 
 - name: stop the old service
-  command: "launchctl unload {{ service_plist_file_path }}"
+  win_nssm:
+    name: "{{ service_name }}"
+    state: absent
   become: yes
-  ignore_errors: yes
 
 # delete old installation (optional)
 
 - name: clear old installation folder
-  file: 
+  win_file: 
     path: "{{ installation_folder }}"
     state: absent
   when: clear_installation_folder_before_install == True
@@ -63,75 +86,75 @@
 # unpack all the files to the installation folder
 
 - name: make sure installation folder exists
-  file:
+  win_file:
     path: "{{ installation_folder }}"
     state: directory
-    owner: "{{ ansible_user_id }}"
   become: yes
 
 - name: unzip the file
-  unarchive:
+  win_unzip:
     src: "{{ temp_folder }}/{{ installer_file_name }}"
     dest: "{{ installation_folder }}"
     remote_src: yes
-    owner: "{{ ansible_user_id }}"
-  become: yes
-
-- name: copy plist
-  template:
-    src: service.plist.j2
-    dest: "{{ service_plist_file_path }}"
-    # in mac - plist owner is root
-    owner: root
   become: yes
 
 - name: copy start script
-  template:
-    src: start.sh.j2
-    dest: "{{ installation_folder }}/start.sh"
-    mode: 0755
-    owner: "{{ ansible_user_id }}"
+  win_template:
+    src: start.bat.j2
+    dest: "{{ installation_folder }}/start.bat"
   become: yes
 
 # configure installed 
 
 - name: update application properties file
-  lineinfile:
+  win_lineinfile:
     path: "{{ installation_folder }}/conf/application.properties"
     line: "server.port={{ server_port }}"
 
 - name: update server port
-  lineinfile:
+  win_lineinfile:
     state: present
     path: "{{ installation_folder }}/conf/cloudagent.conf.xml"
     line: "<main-port>{{ server_port }}</main-port>"
     regexp: "<main-port>\\d*<\\/main-port>"
 
 - name: set permissions for logs folder
-  file:
+  win_file:
     path: "{{ installation_folder }}/logs"
     state: directory
-    mode: 0777
-    owner: "{{ ansible_user_id }}"
   become: yes
 
 - name: reset pairing key
-  file:
+  win_file:
     path: "{{ installation_folder }}/conf/pairing.conf.xml"
     state: absent
   become: yes
 
+# install the service
+
+- name: create the service
+  win_nssm:
+    name: "{{ service_name }}"
+    application: "{{ installation_folder }}\\start.bat"
+    stdout_file: "{{ installation_folder }}\\logs\\server.out.log"
+    stderr_file: "{{ installation_folder }}\\logs\\server.err.log"
+    state: present
+
 # start the service (optional)
 
-- name: load the service
-  command: "launchctl load {{ service_plist_file_path }}"
-  become: yes
+- name: create the service
+  win_nssm:
+    name: "{{ service_name }}"
+    application: "{{ installation_folder }}\\start.bat"
+    stdout_file: "{{ installation_folder }}\\logs\\server.out.log"
+    stderr_file: "{{ installation_folder }}\\logs\\server.err.log"
+    state: started
   when: start_after_install is defined and start_after_install == True
 
 # clear temp files (optional)
 
 - name: clear temp folder
-  file:
+  win_file:
     path: "{{ temp_folder }}"
     state: absent
   when: clear_temp_folder == True

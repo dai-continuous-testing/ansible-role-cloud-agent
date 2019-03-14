@@ -2,4 +2,4 @@
 
 installation_folder: 
 
-temp_folder: 
+service_name: "{{ app_name }}"

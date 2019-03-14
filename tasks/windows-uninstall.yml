@@ -1,0 +1,17 @@
+
+- name: assert all vars are set
+  assert: { that: "{{ item }} != '' " }
+  with_items:
+  - service_name
+  - installation_folder
+
+- name: stop the old service
+  win_nssm:
+    name: "{{ service_name }}"
+    state: absent
+  become: yes
+
+- name: clear old installation folder
+  win_file: 
+    path: "{{ installation_folder }}"
+    state: absent

@@ -8,7 +8,11 @@
         name: ['botocore', 'boto3']
       become: yes
 
+    # windows installation requires nssm
+    - win_chocolatey:
+        name: nssm
+      when: ansible_os_family == "Windows"
+
   roles:
     - role: cloud-agent
-      state: present
       app_version: 12.3.866

@@ -5,7 +5,6 @@
   assert: { that: "{{ item }} != '' " }
   with_items:
   - app_name
-  - temp_folder
   - clear_temp_folder
   - service_name
   - installation_folder
@@ -23,12 +22,19 @@
   - custom_download_url
   when: download_from_s3 == False
 
-# download the file
+# set temp folder
 
-- name: make sure temp folder exists
-  file:
-    path: "{{ temp_folder }}"
+- name: Create temporary build directory
+  tempfile:
     state: directory
+    suffix: "{{ app_name }}"
+  register: temp_folder_command
+
+- name: register tempfolder
+  set_fact:
+    temp_folder: temp_folder_command.path
+
+# download the file
 
 - name: download zip from s3
   aws_s3:
