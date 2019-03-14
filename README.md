@@ -1,4 +1,4 @@
-Experitest - Cloud Agent ansible role for mac os hosts
+Experitest - Cloud Agent ansible role
 =========
 
 This role will install \ uninstall cloud agent for mac os hosts
@@ -46,3 +46,13 @@ To invoke, run the following commands:
 
 - run the playbook \
   *ansible-playbook site.yml*
+
+
+License
+-------
+
+BSD
+
+Author Information
+------------------
+
