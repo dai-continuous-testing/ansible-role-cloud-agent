@@ -37,7 +37,7 @@ In site.yml file
       roles:
         - role: cloud-agent
           state: present
-          app_version: 1.2.3
+          app_version: 12.3.866
 
 To invoke, run the following commands:
 

@@ -1,6 +1,6 @@
 ---
 
-app_version: "12.3.866"
+app_version: 
 
 installer_file_name: "{{ app_name }}_{{ app_version }}.zip"
 

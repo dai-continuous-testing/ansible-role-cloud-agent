@@ -11,3 +11,4 @@
   roles:
     - role: cloud-agent
       state: present
+      app_version: 12.3.866
