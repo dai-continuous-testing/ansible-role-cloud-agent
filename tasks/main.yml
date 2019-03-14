@@ -1,14 +1,13 @@
 ---
 
-- name: verify os is correct
-  fail:
-    msg: "this role only supports mac os"
-  when: ansible_os_family != "Darwin"
+- name: gather os specific variables
+  include_vars: 
+    file: "{{ ansible_os_family | lower }}.yml"
 
 - name: install cloud agent
-  include_tasks: tasks/install.yml
+  include_tasks: "tasks/{{ ansible_os_family | lower }}-install.yml"
   when: state|default('present') == 'present'
 
 - name: uninstall cloud agent
-  include_tasks: tasks/uninstall.yml
+  include_tasks: "tasks/{{ ansible_os_family | lower }}-uninstall.yml"
   when: state|default('present') == 'absent'

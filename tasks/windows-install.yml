@@ -1,0 +1,137 @@
+
+# validation
+
+- name: assert all vars are set
+  assert: { that: "{{ item }} != '' " }
+  with_items:
+  - app_name
+  - temp_folder
+  - clear_temp_folder
+  - service_name
+  - installation_folder
+  - clear_installation_folder_before_install
+  - server_port
+  - service_plist_file_path
+  - installer_file_name
+  - download_from_s3
+  - s3_bucket_name
+  - ansible_user_id
+
+- name: assert all vars are set
+  assert: { that: "{{ item }} != '' " }
+  with_items:
+  - custom_download_url
+  when: download_from_s3 == False
+
+# download the file
+
+- name: make sure temp folder exists
+  file:
+    path: "{{ temp_folder }}"
+    state: directory
+
+- name: download zip from s3
+  aws_s3:
+    bucket: "{{ s3_bucket_name }}"
+    object: "{{ installer_file_name }}"
+    dest: "{{ temp_folder }}/{{ installer_file_name }}"
+    overwrite: different
+    mode: get
+  when: download_from_s3 != False
+
+- name: download zip from url
+  get_url:
+    url: "{{ custom_download_url }}"
+    dest: "{{ temp_folder }}/{{ installer_file_name }}"
+  when: download_from_s3 == False
+
+# stop old service
+
+- name: stop the old service
+  command: "launchctl unload {{ service_plist_file_path }}"
+  become: yes
+  ignore_errors: yes
+
+# delete old installation (optional)
+
+- name: clear old installation folder
+  file: 
+    path: "{{ installation_folder }}"
+    state: absent
+  when: clear_installation_folder_before_install == True
+
+# unpack all the files to the installation folder
+
+- name: make sure installation folder exists
+  file:
+    path: "{{ installation_folder }}"
+    state: directory
+    owner: "{{ ansible_user_id }}"
+  become: yes
+
+- name: unzip the file
+  unarchive:
+    src: "{{ temp_folder }}/{{ installer_file_name }}"
+    dest: "{{ installation_folder }}"
+    remote_src: yes
+    owner: "{{ ansible_user_id }}"
+  become: yes
+
+- name: copy plist
+  template:
+    src: service.plist.j2
+    dest: "{{ service_plist_file_path }}"
+    # in mac - plist owner is root
+    owner: root
+  become: yes
+
+- name: copy start script
+  template:
+    src: start.sh.j2
+    dest: "{{ installation_folder }}/start.sh"
+    mode: 0755
+    owner: "{{ ansible_user_id }}"
+  become: yes
+
+# configure installed 
+
+- name: update application properties file
+  lineinfile:
+    path: "{{ installation_folder }}/conf/application.properties"
+    line: "server.port={{ server_port }}"
+
+- name: update server port
+  lineinfile:
+    state: present
+    path: "{{ installation_folder }}/conf/cloudagent.conf.xml"
+    line: "<main-port>{{ server_port }}</main-port>"
+    regexp: "<main-port>\\d*<\\/main-port>"
+
+- name: set permissions for logs folder
+  file:
+    path: "{{ installation_folder }}/logs"
+    state: directory
+    mode: 0777
+    owner: "{{ ansible_user_id }}"
+  become: yes
+
+- name: reset pairing key
+  file:
+    path: "{{ installation_folder }}/conf/pairing.conf.xml"
+    state: absent
+  become: yes
+
+# start the service (optional)
+
+- name: load the service
+  command: "launchctl load {{ service_plist_file_path }}"
+  become: yes
+  when: start_after_install is defined and start_after_install == True
+
+# clear temp files (optional)
+
+- name: clear temp folder
+  file:
+    path: "{{ temp_folder }}"
+    state: absent
+  when: clear_temp_folder == True
