@@ -46,13 +46,3 @@ To invoke, run the following commands:
 
 - run the playbook \
   *ansible-playbook site.yml*
-
-
-License
--------
-
-BSD
-
-Author Information
-------------------
-
