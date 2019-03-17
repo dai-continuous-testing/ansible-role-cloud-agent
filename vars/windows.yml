@@ -1,5 +1,5 @@
 ---
 
-installation_folder: 
+installation_folder: "C:\\Experitest\\cloud-agent"
 
 service_name: "{{ app_name }}"
