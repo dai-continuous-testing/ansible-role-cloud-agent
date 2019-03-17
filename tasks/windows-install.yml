@@ -43,22 +43,12 @@
 - name: download zip from s3
   block:
 
-    - name: try with aws cli
+    - name: download zip from s3 - try with aws cli
       win_command: "aws s3api get-object --bucket {{ s3_bucket_name }} --key {{ installer_file_name }} {{ temp_folder }}/{{ installer_file_name }}"
       register: command1
       ignore_errors: True
 
-    # - name: try with aws cli
-    #   aws_s3:
-    #     bucket: "{{ s3_bucket_name }}"
-    #     object: "{{ installer_file_name }}"
-    #     dest: "{{ temp_folder }}/{{ installer_file_name }}"
-    #     overwrite: different
-    #     mode: get
-    #   register: command1
-    #   ignore_errors: True
-
-    - name: try with url
+    - name: download zip from s3 - try with url
       win_get_url:
         url: "https://s3.{{ s3_region }}.amazonaws.com/{{ s3_bucket_name }}/{{ installer_file_name }}"
         dest: "{{ temp_folder }}/{{ installer_file_name }}"
