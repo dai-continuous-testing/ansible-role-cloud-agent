@@ -29,9 +29,9 @@
     suffix: "{{ app_name }}"
   register: temp_folder_command
 
-- name: register tempfolder
+- name: register temp folder
   set_fact:
-    temp_folder: temp_folder_command.path
+    temp_folder: "{{ temp_folder_command.path }}"
 
 # download the file
 
@@ -44,17 +44,22 @@
   block:
 
     - name: try with aws cli
-      get_url:
-        bucket: "{{ s3_bucket_name }}"
-        object: "{{ installer_file_name }}"
-        dest: "{{ temp_folder }}/{{ installer_file_name }}"
-        overwrite: different
-        mode: get
+      win_command: "aws s3api get-object --bucket {{ s3_bucket_name }} --key {{ installer_file_name }} {{ temp_folder }}/{{ installer_file_name }}"
       register: command1
       ignore_errors: True
 
+    # - name: try with aws cli
+    #   aws_s3:
+    #     bucket: "{{ s3_bucket_name }}"
+    #     object: "{{ installer_file_name }}"
+    #     dest: "{{ temp_folder }}/{{ installer_file_name }}"
+    #     overwrite: different
+    #     mode: get
+    #   register: command1
+    #   ignore_errors: True
+
     - name: try with url
-      get_url:
+      win_get_url:
         url: "https://s3.{{ s3_region }}.amazonaws.com/{{ s3_bucket_name }}/{{ installer_file_name }}"
         dest: "{{ temp_folder }}/{{ installer_file_name }}"
       when: command1.rc != 0 # try when previous failed
