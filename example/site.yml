@@ -10,4 +10,4 @@
 
   roles:
     - role: cloud-agent
-      app_version: 12.3.866     
+      app_version: 12.4.5373     

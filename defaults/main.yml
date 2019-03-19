@@ -16,6 +16,4 @@ clear_temp_folder: False
 clear_installation_folder_before_install: False
 
 convention: "Agent"
-
 cdn_name: "devops-artifacts.experitest.com"
-download_relative_path: ""
