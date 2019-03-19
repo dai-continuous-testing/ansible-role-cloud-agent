@@ -6,6 +6,7 @@
     # requirement to download from s3
     - pip:
         name: ['botocore', 'boto3']
+        extra_args: --ignore-installed six
       become: yes
       when: ansible_os_family != "Windows"
 
