@@ -32,7 +32,7 @@
 
 - name: register tempfolder
   set_fact:
-    temp_folder: temp_folder_command.path
+    temp_folder: "{{ temp_folder_command.path }}"
 
 # download the file
 
