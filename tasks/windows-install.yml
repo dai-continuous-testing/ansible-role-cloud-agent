@@ -89,6 +89,7 @@
   win_copy:
     src: "{{ temp_folder }}\\{{ (installer_file_name | splitext)[0] }}\\{{ convention }}\\"
     dest: "{{ installation_folder }}"
+    force: no
     remote_src: yes
   become: yes
 
