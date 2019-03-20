@@ -15,6 +15,7 @@
   - ansible_user_id
   - download_from_s3
   - s3_download_url
+  - launcher_file_name
 
 - name: assert all vars are set
   assert: { that: "{{ item }} != '' " }

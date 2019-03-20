@@ -4,7 +4,6 @@ download_from_s3: True
 
 app_name: cloudagent
 service_name: "com.experitest.{{ app_name }}"
-main_class: "com.experitest.cloudagent.MainForwarder"
 
 server_port: 8081
 jmx_port: 51234
