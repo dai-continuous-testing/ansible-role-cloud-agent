@@ -14,7 +14,5 @@ to use the example:
 
 ## Known issues
 
-- mac os - it might throw the error "boto3 is not installed" \
-  make sure pip is configured in path \
-  to fix - add the line *export PATH="/usr/local/bin:$PATH"* to ~/.bashrc file
+- dependencies like Java8 must be installed before run the playbook
 

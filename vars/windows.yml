@@ -2,9 +2,11 @@
 
 installation_folder: "C:\\Experitest\\cloud-agent"
 
+temp_folder: "c:\\temp\\experitest"
+
 service_name: "{{ app_name }}"
 
 installer_file_name: "dist-Windows-AGENT-{{ app_version }}.zip"
 
 relative_path: "cloud-agent/windows"
-download_url : "https://{{ cdn_name }}/{{download_relative_path}}/{{ installer_file_name }}"
+s3_download_url : "https://{{ cdn_name }}/{{download_relative_path}}/{{ installer_file_name }}"

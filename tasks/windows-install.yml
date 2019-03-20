@@ -12,32 +12,35 @@
   - server_port
   - service_name
   - installer_file_name
-  - s3_bucket_name
-  - download_url
+  - download_from_s3
+  - s3_download_url
+
+- name: assert all vars are set
+  assert: { that: "{{ item }} != '' " }
+  with_items:
+  - custom_download_url
+  when: download_from_s3 == False
 
 # set temp folder
-
-- name: Create temporary build directory
-  win_tempfile:
-    state: directory
-    suffix: "{{ app_name }}"
-  register: temp_folder_command
-
-- name: register temp folder
-  set_fact:
-    temp_folder: "{{ temp_folder_command.path }}"
-
-# download the file
 
 - name: make sure temp folder exists
   win_file:
     path: "{{ temp_folder }}"
     state: directory
 
-- name: download zip from url
+# download the file
+
+- name: download zip from s3 url
   win_get_url:
-    url: "{{ download_url }}"
+    url: "{{ s3_download_url }}"
     dest: "{{ temp_folder }}\\{{ installer_file_name }}"
+  when: download_from_s3 != False
+
+- name: download zip from custom url
+  win_get_url:
+    url: "{{ custom_download_url }}"
+    dest: "{{ temp_folder }}\\{{ installer_file_name }}"
+  when: download_from_s3 == False
 
 # stop old service
 
@@ -66,6 +69,13 @@
 - name: unzip the file
   win_unzip:
     src: "{{ temp_folder }}\\{{ installer_file_name }}"
+    dest: "{{ temp_folder }}\\{{ (installer_file_name | splitext)[0] }}"
+    remote_src: yes
+  become: yes
+
+- name: copy the file to installation folder
+  win_copy:
+    src: "{{ temp_folder }}\\{{ (installer_file_name | splitext)[0] }}\\{{ convention }}"
     dest: "{{ installation_folder }}"
     remote_src: yes
   become: yes
@@ -73,32 +83,32 @@
 - name: copy start script
   win_template:
     src: start.bat.j2
-    dest: "{{ installation_folder }}\\{{ convention }}\\start.bat"
+    dest: "{{ installation_folder }}\\start.bat"
   become: yes
 
 # configure installed 
 
 - name: update application properties file
   win_lineinfile:
-    path: "{{ installation_folder }}\\{{ convention }}\\conf\\application.properties"
+    path: "{{ installation_folder }}\\conf\\application.properties"
     line: "server.port={{ server_port }}"
 
 - name: update server port
   win_lineinfile:
     state: present
-    path: "{{ installation_folder }}\\{{ convention }}\\conf\\cloudagent.conf.xml"
+    path: "{{ installation_folder }}\\conf\\cloudagent.conf.xml"
     line: "<main-port>{{ server_port }}</main-port>"
     regexp: "<main-port>\\d*<\\/main-port>"
 
 - name: set permissions for logs folder
   win_file:
-    path: "{{ installation_folder }}\\{{ convention }}\\logs"
+    path: "{{ installation_folder }}\\logs"
     state: directory
   become: yes
 
 - name: reset pairing key
   win_file:
-    path: "{{ installation_folder }}\\{{ convention }}\\conf\\pairing.conf.xml"
+    path: "{{ installation_folder }}\\conf\\pairing.conf.xml"
     state: absent
   become: yes
 
@@ -107,9 +117,9 @@
 - name: create the service
   win_nssm:
     name: "{{ service_name }}"
-    application: "{{ installation_folder }}\\{{ convention }}\\start.bat"
-    stdout_file: "{{ installation_folder }}\\{{ convention }}\\logs\\server.out.log"
-    stderr_file: "{{ installation_folder }}\\{{ convention }}\\logs\\server.err.log"
+    application: "{{ installation_folder }}\\start.bat"
+    stdout_file: "{{ installation_folder }}\\logs\\server.out.log"
+    stderr_file: "{{ installation_folder }}\\logs\\server.err.log"
     state: present
 
 # start the service (optional)
@@ -117,9 +127,9 @@
 - name: create the service
   win_nssm:
     name: "{{ service_name }}"
-    application: "{{ installation_folder }}\\{{ convention }}\\start.bat"
-    stdout_file: "{{ installation_folder }}\\{{ convention }}\\logs\\server.out.log"
-    stderr_file: "{{ installation_folder }}\\{{ convention }}\\logs\\server.err.log"
+    application: "{{ installation_folder }}\\start.bat"
+    stdout_file: "{{ installation_folder }}\\logs\\server.out.log"
+    stderr_file: "{{ installation_folder }}\\logs\\server.err.log"
     state: started
   when: start_after_install is defined and start_after_install == True
 

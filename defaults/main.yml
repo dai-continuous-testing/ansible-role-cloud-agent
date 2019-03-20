@@ -1,7 +1,6 @@
 ---
 
-s3_bucket_name: experitest-artifacts-bucket
-s3_region: us-east-1
+download_from_s3: True
 
 app_name: cloudagent
 service_name: "com.experitest.{{ app_name }}"
