@@ -138,7 +138,7 @@
 
 # start the service (optional)
 
-- name: create the service
+- name: start the service
   win_nssm:
     name: "{{ service_name }}"
     application: "{{ installation_folder }}\\{{ launcher_file_name }}"
