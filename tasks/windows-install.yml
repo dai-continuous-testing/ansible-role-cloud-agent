@@ -144,7 +144,7 @@
     application: "{{ installation_folder }}\\{{ launcher_file_name }}"
     stdout_file: "{{ installation_folder }}\\logs\\server.out.log"
     stderr_file: "{{ installation_folder }}\\logs\\server.err.log"
-    state: started
+    state: restarted
   become: yes
   when: start_after_install is defined and start_after_install == True
   
