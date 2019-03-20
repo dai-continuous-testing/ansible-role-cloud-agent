@@ -86,13 +86,11 @@
     remote_src: yes
     creates: "{{ temp_folder }}/{{ (installer_file_name | splitext)[0] }}/{{ convention }}"
     owner: "{{ ansible_user_id }}"
-  become: 
-  register: unzip
+  become: yes
 
 - name: copy the file to installation folder
   command: "cp -r {{ temp_folder }}/{{ (installer_file_name | splitext)[0] }}/{{ convention }}/ {{ installation_folder }}/"
   become: yes
-  when: unzip.changed
 
 - name: copy plist
   template:
