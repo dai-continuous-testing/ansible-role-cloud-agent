@@ -68,11 +68,18 @@
     state: directory
   become: yes
 
+- name: make sure unzip folder exists
+  win_file:
+    path: "{{ temp_folder }}\\{{ (installer_file_name | splitext)[0] }}"
+    state: directory
+  become: yes
+
 - name: unzip the file
   win_unzip:
     src: "{{ temp_folder }}\\{{ installer_file_name }}"
     dest: "{{ temp_folder }}\\{{ (installer_file_name | splitext)[0] }}"
     remote_src: yes
+    creates: "{{ temp_folder }}\\{{ (installer_file_name | splitext)[0] }}\\{{ convention }}"
   become: yes
 
 - name: copy the file to installation folder
@@ -88,6 +95,7 @@
   win_lineinfile:
     path: "{{ installation_folder }}\\conf\\application.properties"
     line: "server.port={{ server_port }}"
+  become: yes
 
 - name: update server port
   win_lineinfile:
@@ -95,6 +103,7 @@
     path: "{{ installation_folder }}\\conf\\cloudagent.conf.xml"
     line: "<main-port>{{ server_port }}</main-port>"
     regexp: "<main-port>\\d*<\\/main-port>"
+  become: yes
 
 - name: set permissions for logs folder
   win_file:

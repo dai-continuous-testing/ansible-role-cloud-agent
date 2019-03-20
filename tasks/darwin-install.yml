@@ -70,21 +70,27 @@
     owner: "{{ ansible_user_id }}"
   become: yes
 
+- name: make sure unzip folder exist
+  file:
+    path: "{{ temp_folder }}/{{ (installer_file_name | splitext)[0] }}"
+    state: directory
+    owner: "{{ ansible_user_id }}"
+  become: yes
+
 - name: unzip the file
   unarchive:
     src: "{{ temp_folder }}/{{ installer_file_name }}"
     dest: "{{ temp_folder }}/{{ (installer_file_name | splitext)[0] }}"
     remote_src: yes
+    creates: "{{ temp_folder }}/{{ (installer_file_name | splitext)[0] }}/{{ convention }}"
     owner: "{{ ansible_user_id }}"
-  become: yes
+  become: 
+  register: unzip
 
 - name: copy the file to installation folder
-  copy:
-    src: "{{ temp_folder }}/{{ (installer_file_name | splitext)[0] }}/{{ convention }}"
-    dest: "{{ installation_folder }}"
-    remote_src: yes
-    owner: "{{ ansible_user_id }}"
+  command: "cp -r {{ temp_folder }}/{{ (installer_file_name | splitext)[0] }}/{{ convention }}/ {{ installation_folder }}/"
   become: yes
+  when: unzip.changed
 
 - name: copy plist
   template:
@@ -94,20 +100,13 @@
     owner: root
   become: yes
 
-- name: copy start script
-  template:
-    src: start.sh.j2
-    dest: "{{ installation_folder }}/start.sh"
-    mode: 0755
-    owner: "{{ ansible_user_id }}"
-  become: yes
-
 # configure installed 
 
 - name: update application properties file
   lineinfile:
     path: "{{ installation_folder }}/conf/application.properties"
     line: "server.port={{ server_port }}"
+  become: yes
 
 - name: update server port
   lineinfile:
@@ -115,6 +114,7 @@
     path: "{{ installation_folder }}/conf/cloudagent.conf.xml"
     line: "<main-port>{{ server_port }}</main-port>"
     regexp: "<main-port>\\d*<\\/main-port>"
+  become: yes
 
 - name: set permissions for logs folder
   file:
@@ -143,4 +143,5 @@
   file:
     path: "{{ temp_folder }}"
     state: absent
+  become: yes
   when: clear_temp_folder == True
