@@ -7,9 +7,11 @@
   - app_name
   - clear_temp_folder
   - service_name
+  - main_class
   - installation_folder
   - clear_installation_folder_before_install
   - server_port
+  - jmx_port
   - service_plist_file_path
   - installer_file_name
   - ansible_user_id
@@ -98,6 +100,14 @@
     dest: "{{ service_plist_file_path }}"
     # in mac - plist owner is root
     owner: root
+  become: yes
+
+- name: copy start script
+  template:
+    src: start.sh.j2
+    dest: "{{ installation_folder }}/{{ launcher_file_name }}"
+    mode: 0755
+    owner: "{{ ansible_user_id }}"
   become: yes
 
 # configure installed 
