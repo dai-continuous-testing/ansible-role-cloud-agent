@@ -1,0 +1,13 @@
+{
+    "sshfs.configs": [
+        {
+            "host": "192.168.4.122",
+            "label": "ansible-experitest",
+            "name": "ansible-experitest",
+            "password": "Experitest@2018",
+            "putty": true,
+            "root": "/root/example/ansible-role-cloud-agent/example",
+            "username": "root"
+        }
+    ]
+}
