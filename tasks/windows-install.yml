@@ -37,12 +37,14 @@
   win_get_url:
     url: "{{ s3_download_url }}"
     dest: "{{ temp_folder }}\\{{ installer_file_name }}"
+    force: no
   when: download_from_s3 != False
 
 - name: download zip from custom url
   win_get_url:
     url: "{{ custom_download_url }}"
     dest: "{{ temp_folder }}\\{{ installer_file_name }}"
+    force: no
   when: download_from_s3 == False
 
 # stop old service
@@ -85,7 +87,7 @@
 
 - name: copy the file to installation folder
   win_copy:
-    src: "{{ temp_folder }}\\{{ (installer_file_name | splitext)[0] }}\\{{ convention }}"
+    src: "{{ temp_folder }}\\{{ (installer_file_name | splitext)[0] }}\\{{ convention }}\\"
     dest: "{{ installation_folder }}"
     remote_src: yes
   become: yes
