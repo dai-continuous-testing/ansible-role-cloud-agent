@@ -14,15 +14,8 @@
   - server_port
   - jmx_port
   - installer_file_name
-  - download_from_s3
   - s3_download_url
   - launcher_file_name
-
-- name: assert all vars are set
-  assert: { that: "{{ item }} != '' " }
-  with_items:
-  - custom_download_url
-  when: download_from_s3 == False
 
 # required dependencies
 
@@ -54,14 +47,14 @@
     url: "{{ s3_download_url }}"
     dest: "{{ temp_folder }}\\{{ installer_file_name }}"
     force: no
-  when: download_from_s3 != False
+  when: custom_download_url == ""
 
 - name: download zip from custom url
   win_get_url:
     url: "{{ custom_download_url }}"
     dest: "{{ temp_folder }}\\{{ installer_file_name }}"
     force: no
-  when: download_from_s3 == False
+  when: custom_download_url != ""
 
 # stop old service
 
