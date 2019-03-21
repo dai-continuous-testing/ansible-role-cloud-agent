@@ -1,15 +1,39 @@
-winrm quickconfig -q
-winrm set winrm/config/winrs '@{MaxMemoryPerShellMB="2048"}'
-winrm set winrm/config '@{MaxTimeoutms="1800000"}'
-winrm set winrm/config/service '@{AllowUnencrypted="true"}'
-winrm set winrm/config/service/auth '@{Basic="true"}'
 
+#########################################################
+# bootstrap script for ansible
+# configures - powershell, firewall, and winrm settings
+#########################################################
 
-netsh advfirewall firewall add rule name="WinRM 5985" protocol=TCP dir=in localport=5985 action=allow
-netsh advfirewall firewall add rule name="WinRM 5986" protocol=TCP dir=in localport=5986 action=allow
+$username = <username>
+$password = <password>
 
-net stop winrm
-sc config winrm start=auto
-net start winrm
+###
 
-Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope LocalMachine
+$url = "https://raw.githubusercontent.com/jborean93/ansible-windows/master/scripts/Upgrade-PowerShell.ps1"
+$file = "$env:temp\Upgrade-PowerShell.ps1"
+
+(New-Object -TypeName System.Net.WebClient).DownloadFile($url, $file)
+Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Force
+
+&$file -Version 5.1 -Username $username -Password $password -Verbose
+
+###
+
+$url = "https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1"
+$file = "$env:temp\ConfigureRemotingForAnsible.ps1"
+
+(New-Object -TypeName System.Net.WebClient).DownloadFile($url, $file)
+
+powershell.exe -ExecutionPolicy ByPass -File $file
+
+winrm enumerate winrm/config/Listener
+
+winrm quickconfig
+
+winrm get winrm/config/Service
+
+winrm get winrm/config/Winrs
+
+(Get-Service -Name winrm).Status
+
+###
