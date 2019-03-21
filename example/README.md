@@ -14,15 +14,20 @@ to use the example:
 
 ## Known issues
 
-- dependencies like Java8 must be installed before run the playbook
+## mac runner
+when running ansible scripts from mac to winrm.\
+actions are required:
+- pip install "pywinrm>=0.2.2"
+- *export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES*
 
-- for windows target:
-  - add the command *export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES*
-  - pip install "pywinrm>=0.2.2"
+## mac target
 
-- windows target:
-  run the bootstrap script in the target machine
-  NOTE: *update username and password first*
+### make sure to add:
+    export PATH="/usr/local/bin:$PATH" >> ~/.bashrc
 
+## windows target
+run the bootstrap.ps1 script in the target machine\
+NOTE:\
+*update username and password first*
 
 
