@@ -24,6 +24,22 @@
   - custom_download_url
   when: download_from_s3 == False
 
+# required dependencies
+
+- name: install nssm dependency
+  win_chocolatey:
+    name: nssm
+
+- name: make sure java is installed on the machine
+  win_command: java -version
+  register: java_test
+  ignore_errors: yes
+
+- name: fail if java is not found
+  fail:
+    msg: java must be accesible in path
+  when: java_test.rc != 0
+
 # set temp folder
 
 - name: make sure temp folder exists
