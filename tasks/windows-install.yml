@@ -65,7 +65,11 @@
   become: yes
 
 - name: kill adb processes
-  win_command: Taskkill /IM adb.exe /F
+  win_shell: |
+    taskkill /IM adb.exe /F
+  register: killadbresults
+  changed_when: killadbresults.rc == 0 and 'The process "adb.exe" not found.' not in killadbresults.stderr
+  failed_when: killadbresults.rc != 0 and 'The process "adb.exe" not found.' not in killadbresults.stderr
   become: yes
 
 # delete old installation (optional)
