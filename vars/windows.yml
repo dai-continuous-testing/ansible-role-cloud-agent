@@ -1,6 +1,6 @@
 ---
 
-installation_folder: "C:\\Experitest\\cloud-agent"
+installation_folder: "C:\\Experitest\\{{ app_name }}-{{ app_version }}"
 
 temp_folder: "c:\\temp\\experitest"
 
