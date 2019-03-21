@@ -4,6 +4,7 @@
   with_items:
   - service_name
   - installation_folder
+  - temp_folder
 
 - name: stop the old service
   win_nssm:
@@ -11,7 +12,21 @@
     state: absent
   become: yes
 
-- name: clear old installation folder
+- name: kill adb processes
+  win_shell: |
+    taskkill /IM adb.exe /F
+  register: killadbresults
+  changed_when: killadbresults.rc == 0 and 'The process "adb.exe" not found.' not in killadbresults.stderr
+  failed_when: killadbresults.rc != 0 and 'The process "adb.exe" not found.' not in killadbresults.stderr
+  become: yes
+
+- name: remove installation folder
   win_file: 
     path: "{{ installation_folder }}"
     state: absent
+
+- name: remove temp folder
+  win_file:
+    path: "{{ temp_folder }}"
+    state: absent
+  when: clear_temp_folder == True

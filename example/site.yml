@@ -3,18 +3,9 @@
 
   pre_tasks:
     
-    # requirement to download from s3
-    - pip:
-        name: ['botocore', 'boto3']
-        extra_args: --ignore-installed six
-      become: yes
-      when: ansible_os_family != "Windows"
-
     # windows installation requires nssm
-    - win_chocolatey:
-        name: nssm
+    - win_chocolatey: name=jdk8
       when: ansible_os_family == "Windows"
 
   roles:
     - role: cloud-agent
-      app_version: 12.3.866

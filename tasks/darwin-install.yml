@@ -7,56 +7,57 @@
   - app_name
   - clear_temp_folder
   - service_name
+  - main_class
   - installation_folder
   - clear_installation_folder_before_install
   - server_port
+  - jmx_port
   - service_plist_file_path
   - installer_file_name
-  - download_from_s3
-  - s3_bucket_name
   - ansible_user_id
+  - s3_download_url
+  - launcher_file_name
 
-- name: assert all vars are set
-  assert: { that: "{{ item }} != '' " }
-  with_items:
-  - custom_download_url
-  when: download_from_s3 == False
+# required dependencies
+
+- name: make sure java is installed on the machine
+  command: java -version
+  register: java_test
+  ignore_errors: yes
+
+- name: fail if java is not found
+  fail:
+    msg: java must be accesible in path
+  when: java_test.rc != 0
 
 # set temp folder
 
-- name: Create temporary build directory
-  tempfile:
+- name: make sure temp folder
+  file:
+    path: "{{ temp_folder }}"
     state: directory
-    suffix: "{{ app_name }}"
-  register: temp_folder_command
-
-- name: register tempfolder
-  set_fact:
-    temp_folder: "{{ temp_folder_command.path }}"
+    owner: "{{ ansible_user_id }}"
+  become: yes
 
 # download the file
 
-- name: download zip from s3
-  aws_s3:
-    bucket: "{{ s3_bucket_name }}"
-    object: "{{ installer_file_name }}"
+- name: download zip from s3 url
+  get_url:
+    url: "{{ s3_download_url }}"
     dest: "{{ temp_folder }}/{{ installer_file_name }}"
-    overwrite: different
-    mode: get
-  when: download_from_s3 != False
+  when: custom_download_url == ""
 
-- name: download zip from url
+- name: download zip from custom url
   get_url:
     url: "{{ custom_download_url }}"
     dest: "{{ temp_folder }}/{{ installer_file_name }}"
-  when: download_from_s3 == False
+  when: custom_download_url != ""
 
 # stop old service
 
 - name: stop the old service
   command: "launchctl unload {{ service_plist_file_path }}"
   become: yes
-  ignore_errors: yes
 
 # delete old installation (optional)
 
@@ -66,7 +67,7 @@
     state: absent
   when: clear_installation_folder_before_install == True
 
-# unpack all the files to the installation folder
+# unpack and copy all the files to the installation folder
 
 - name: make sure installation folder exists
   file:
@@ -75,12 +76,24 @@
     owner: "{{ ansible_user_id }}"
   become: yes
 
+- name: make sure unzip folder exist
+  file:
+    path: "{{ temp_folder }}/{{ (installer_file_name | splitext)[0] }}"
+    state: directory
+    owner: "{{ ansible_user_id }}"
+  become: yes
+
 - name: unzip the file
   unarchive:
     src: "{{ temp_folder }}/{{ installer_file_name }}"
-    dest: "{{ installation_folder }}"
+    dest: "{{ temp_folder }}/{{ (installer_file_name | splitext)[0] }}"
     remote_src: yes
+    creates: "{{ temp_folder }}/{{ (installer_file_name | splitext)[0] }}/{{ convention }}"
     owner: "{{ ansible_user_id }}"
+  become: yes
+
+- name: copy the file to installation folder
+  command: "cp -r {{ temp_folder }}/{{ (installer_file_name | splitext)[0] }}/{{ convention }}/ {{ installation_folder }}/"
   become: yes
 
 - name: copy plist
@@ -94,7 +107,7 @@
 - name: copy start script
   template:
     src: start.sh.j2
-    dest: "{{ installation_folder }}/start.sh"
+    dest: "{{ installation_folder }}/{{ launcher_file_name }}"
     mode: 0755
     owner: "{{ ansible_user_id }}"
   become: yes
@@ -105,6 +118,7 @@
   lineinfile:
     path: "{{ installation_folder }}/conf/application.properties"
     line: "server.port={{ server_port }}"
+  become: yes
 
 - name: update server port
   lineinfile:
@@ -112,6 +126,7 @@
     path: "{{ installation_folder }}/conf/cloudagent.conf.xml"
     line: "<main-port>{{ server_port }}</main-port>"
     regexp: "<main-port>\\d*<\\/main-port>"
+  become: yes
 
 - name: set permissions for logs folder
   file:
@@ -127,6 +142,12 @@
     state: absent
   become: yes
 
+# install cambrionix package
+
+- name: start the installation for cambrionix tools
+  debug:
+    msg: TODO - add invocation
+
 # start the service (optional)
 
 - name: load the service
@@ -140,4 +161,5 @@
   file:
     path: "{{ temp_folder }}"
     state: absent
+  become: yes
   when: clear_temp_folder == True

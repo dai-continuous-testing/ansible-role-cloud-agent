@@ -14,7 +14,20 @@ to use the example:
 
 ## Known issues
 
-- mac os - it might throw the error "boto3 is not installed" \
-  make sure pip is configured in path \
-  to fix - add the line *export PATH="/usr/local/bin:$PATH"* to ~/.bashrc file
+## mac runner
+when running ansible scripts from mac to winrm.\
+actions are required:
+- pip install "pywinrm>=0.2.2"
+- *export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES*
+
+## mac target
+
+### make sure to add:
+    export PATH="/usr/local/bin:$PATH" >> ~/.bashrc
+
+## windows target
+run the bootstrap.ps1 script in the target machine\
+NOTE:\
+*update username and password first*
+
 

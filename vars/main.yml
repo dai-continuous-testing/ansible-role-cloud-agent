@@ -1,11 +1,5 @@
 ---
 
-app_version: 
+app_version: 12.4.5373
 
-# 
-# customizing download file url
-# to come from url
-# works along with the property:
-# download_from_s3: False
-# 
-custom_download_url:
+custom_download_url: ""

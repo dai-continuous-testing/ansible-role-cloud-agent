@@ -1,20 +1,16 @@
 ---
 
-download_from_s3: True
-
-s3_bucket_name: seetest-io-build-artifacts
-s3_region: us-east-2
-
-installer_file_name: "{{ app_name }}_{{ app_version }}.zip"
-
 app_name: cloudagent
 service_name: "com.experitest.{{ app_name }}"
 main_class: "com.experitest.cloudagent.MainForwarder"
 
-server_port: 8081
+server_port: 8080
 jmx_port: 51234
 
 start_after_install: True
 
 clear_temp_folder: False
 clear_installation_folder_before_install: False
+
+convention: "Agent"
+cdn_name: "devops-artifacts.experitest.com"
