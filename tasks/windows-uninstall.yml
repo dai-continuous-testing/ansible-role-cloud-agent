@@ -12,6 +12,10 @@
     state: absent
   become: yes
 
+- name: kill adb processes
+  win_command: Taskkill /IM adb.exe /F
+  become: yes
+
 - name: remove installation folder
   win_file: 
     path: "{{ installation_folder }}"
