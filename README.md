@@ -12,12 +12,17 @@ Supports mac os hosts only.
 Role Variables
 --------------
 
-Role variables are as following:
-  - app_version: set application version
-  - installation_folder: set alternative installation location
-  - custom_download_url: works with "download_from_s3: False". provides alternative url to download the zip file
-  - state: present \ absent
-  - server_port: port number for the process listen to
+| Name | Description | Type | Default | Required |
+|------|-------------|:----:|:-----:|:-----:|
+| state | should the application be present or absent | present, absent | present | no |
+| app_version | application version to install | string | 12.4.5373 | no |
+| server_port | port number for the server | number | 8080 | no |
+| installation_folder | the folder in which the applction will be installed | string | for mac: ~/experitest/cloud-agent-version <br> for windows: C:\\Experitest\\cloud-agent  | no |
+| jmx_port | port number for jmx inspection | number | 51234 | no |
+| custom_download_url | custom url to download the installation from (zip format) | string |  | no |
+| start_after_install | should application start after installation is completed | boolean | True | no |
+| clear_temp_folder | remove temp folder after installation | boolean | False | no |
+| clear_installation_folder_before_install | removing old installation before installing new version | boolean | False | no |
 
 Example Playbook
 ----------------
