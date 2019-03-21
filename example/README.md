@@ -16,3 +16,6 @@ to use the example:
 
 - dependencies like Java8 must be installed before run the playbook
 
+- for windows target:
+  - add the command export OBJC_DISABLE_INITIALIZE_FORK_SAFETpY=YES
+  - pip install "pywinrm>=0.2.2"
