@@ -26,3 +26,4 @@
   file:
     path: "{{ temp_folder }}"
     state: absent
+  when: clear_temp_folder == True

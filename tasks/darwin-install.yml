@@ -142,6 +142,12 @@
     state: absent
   become: yes
 
+# install cambrionix package
+
+- name: start the installation for cambrionix tools
+  debug:
+    msg: TODO - add invocation
+
 # start the service (optional)
 
 - name: load the service

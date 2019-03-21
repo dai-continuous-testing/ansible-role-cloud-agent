@@ -144,6 +144,12 @@
     state: absent
   become: yes
 
+# install cambrionix package
+
+- name: start the installation for cambrionix tools
+  debug:
+    msg: TODO - add invocation
+
 # install the service
 
 - name: create the service
@@ -166,7 +172,6 @@
   become: yes
   when: start_after_install is defined and start_after_install == True
   
-
 # clear temp files (optional)
 
 - name: clear temp folder
