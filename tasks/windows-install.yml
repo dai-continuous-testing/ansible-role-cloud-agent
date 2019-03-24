@@ -158,20 +158,9 @@
     application: "{{ installation_folder }}\\{{ launcher_file_name }}"
     stdout_file: "{{ installation_folder }}\\logs\\server.out.log"
     stderr_file: "{{ installation_folder }}\\logs\\server.err.log"
-    state: present
-
-# start the service (optional)
-
-- name: start the service
-  win_nssm:
-    name: "{{ service_name }}"
-    application: "{{ installation_folder }}\\{{ launcher_file_name }}"
-    stdout_file: "{{ installation_folder }}\\logs\\server.out.log"
-    stderr_file: "{{ installation_folder }}\\logs\\server.err.log"
-    state: restarted
+    state: "{{ (start_after_install is defined and start_after_install == True) | ternary('restarted', 'stopped')  }}"
   become: yes
-  when: start_after_install is defined and start_after_install == True
-  
+
 # clear temp files (optional)
 
 - name: clear temp folder
