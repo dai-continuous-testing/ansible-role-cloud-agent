@@ -59,6 +59,14 @@
   command: "launchctl unload {{ service_plist_file_path }}"
   become: yes
 
+- name: kill adb processes
+  shell: |
+    killall adb
+  register: killadbresults
+  changed_when: killadbresults.rc == 0
+  failed_when: killadbresults.rc != 0 or killadbresults.rc != 1
+  become: yes
+
 # delete old installation (optional)
 
 - name: clear old installation folder
