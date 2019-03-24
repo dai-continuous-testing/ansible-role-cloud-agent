@@ -10,7 +10,7 @@
   - service_name
   - main_class
   - installation_folder
-  - clear_installation_folder_before_install
+  - clear_before_install
   - server_port
   - jmx_port
   - installer_file_name
@@ -78,7 +78,7 @@
   win_file: 
     path: "{{ installation_folder }}"
     state: absent
-  when: clear_installation_folder_before_install == True
+  when: clear_before_install == True
 
 # unpack all the files to the installation folder
 
