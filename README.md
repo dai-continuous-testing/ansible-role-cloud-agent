@@ -16,9 +16,9 @@ Role Variables
 |------|-------------|:----:|:-----:|:-----:|
 | state | should the application be present or absent | present, absent | present | no |
 | app_version | application version to install | string | 12.4.5373 | no |
-| server_port | port number for the server | number | 8080 | no |
+| server_port | port number for the server | number | 8081 | no |
 | installation_folder | the folder in which the applction will be installed | string | for mac: ~/experitest/cloud-agent-version <br> for windows: C:\\Experitest\\cloud-agent  | no |
-| jmx_port | port number for jmx inspection | number | 51234 | no |
+| jmx_port | port number for jmx inspection | number | 51235 | no |
 | custom_download_url | custom url to download the installation from (zip format) | string |  | no |
 | start_after_install | should application start after installation is completed | boolean | True | no |
 | clear_temp_folder | remove temp folder after installation | boolean | False | no |
