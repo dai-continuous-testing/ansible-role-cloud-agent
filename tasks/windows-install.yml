@@ -22,6 +22,12 @@
 - name: install nssm dependency
   win_chocolatey:
     name: nssm
+  become: yes
+
+- name: install vcredist2013 dependency
+  win_chocolatey:
+    name: vcredist2013
+  become: yes
 
 - name: make sure java is installed on the machine
   win_command: java -version
@@ -152,9 +158,16 @@
 
 # install cambrionix package
 
+- name: search cambrionix package
+  win_find:
+    paths: "{{ installation_folder }}\\bin\\cambrionix"
+    patterns: '*.exe'
+  register: cmbx_installer
+
 - name: start the installation for cambrionix tools
-  debug:
-    msg: TODO - add invocation
+  win_command: "{{ cmbx_installer.files[0].path }} /S"
+  ignore_errors: True
+  become: yes
 
 # install the service
 

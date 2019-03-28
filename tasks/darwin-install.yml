@@ -64,7 +64,7 @@
     killall adb
   register: killadbresults
   changed_when: killadbresults.rc == 0
-  failed_when: killadbresults.rc != 0 or killadbresults.rc != 1
+  failed_when: killadbresults.rc != 0 and killadbresults.rc != 1
   become: yes
 
 # delete old installation (optional)
@@ -163,9 +163,16 @@
 
 # install cambrionix package
 
+- name: search cambrionix package
+  find:
+    paths: "{{ installation_folder }}/bin/cambrionix"
+    patterns: '*.pkg'
+  register: cmbx_installer
+
 - name: start the installation for cambrionix tools
-  debug:
-    msg: TODO - add invocation
+  command: "/usr/sbin/installer -allowUntrusted -verboseR -dumplog -pkg {{ cmbx_installer.files[0].path }} -target /"
+  ignore_errors: True
+  become: yes
 
 # clear temp files (optional)
 
