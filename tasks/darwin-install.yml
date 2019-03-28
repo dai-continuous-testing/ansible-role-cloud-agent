@@ -131,6 +131,7 @@
   lineinfile:
     path: "{{ installation_folder }}/conf/application.properties"
     line: "server.port={{ server_port }}"
+    regexp: "^server.port="
   become: yes
 
 - name: update server port
