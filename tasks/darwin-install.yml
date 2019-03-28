@@ -130,8 +130,13 @@
 - name: update application properties file
   lineinfile:
     path: "{{ installation_folder }}/conf/application.properties"
-    line: "server.port={{ server_port }}"
-    regexp: "^server.port="
+    line: "{{ item.key }}={{ item.value }}"
+    regexp: "^{{ item.key | replace('.', '\\.') }}="
+  with_items:
+    
+    - key: server.port
+      value: "{{ server_port }}"
+      
   become: yes
 
 - name: update server port
@@ -139,7 +144,7 @@
     state: present
     path: "{{ installation_folder }}/conf/cloudagent.conf.xml"
     line: "<main-port>{{ server_port }}</main-port>"
-    regexp: "<main-port>\\d*<\\/main-port>"
+    regexp: "^<main-port>\\d*<\\/main-port>"
   become: yes
 
 - name: set permissions for logs folder
