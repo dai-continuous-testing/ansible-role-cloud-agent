@@ -11,3 +11,5 @@ installer_file_name: "dist-Windows-AGENT-{{ app_version }}.zip"
 relative_path: "cloud-agent/windows"
 
 launcher_file_name: "start.bat"
+
+cambrionix_api_path: "C:\\Program Files (x86)\\Cambrionix\\Cambrionix API"

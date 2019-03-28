@@ -20,6 +20,10 @@
   failed_when: killadbresults.rc != 0 and 'The process "adb.exe" not found.' not in killadbresults.stderr
   become: yes
 
+- name: uninstall cambrionix api
+  win_command: '"{{ cambrionix_api_path }}\\uninstall.exe" /S'
+  ignore_errors: yes
+
 - name: remove installation folder
   win_file: 
     path: "{{ installation_folder }}"

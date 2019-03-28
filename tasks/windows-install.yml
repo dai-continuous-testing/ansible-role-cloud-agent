@@ -164,17 +164,24 @@
 
 # install cambrionix package
 
-- name: search cambrionix package
-  win_find:
-    paths: "{{ installation_folder }}\\bin\\cambrionix"
-    patterns: '*.exe'
-  register: cmbx_installer
+- name: check if cambrionix api is installed on the machine
+  win_command: '"{{ cambrionix_api_path }}\\cbrxd.exe" --version'
+  register: cbrxd_test
+  ignore_errors: yes
 
-- name: start the installation for cambrionix tools
-  win_command: "{{ cmbx_installer.files[0].path }} /S"
-  ignore_errors: True
-  become: yes
-
+- block:
+    - name: search cambrionix package
+      win_find:
+        paths: "{{ installation_folder }}\\bin\\cambrionix"
+        patterns: '*.exe'
+      register: cmbx_installer
+    
+    - name: start the installation for cambrionix tools
+      win_command: "{{ cmbx_installer.files[0].path }} /S"
+      ignore_errors: True
+      become: yes
+  when: cbrxd_test.rc != 0
+  
 # install the service
 
 - name: create the service
