@@ -7,6 +7,8 @@ main_class: "com.experitest.cloudagent.MainForwarder"
 server_port: 8081
 jmx_port: 51235
 
+extra_app_props: {}
+
 start_after_install: True
 
 clear_temp_folder: False
