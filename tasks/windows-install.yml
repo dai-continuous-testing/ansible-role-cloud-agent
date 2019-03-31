@@ -160,7 +160,8 @@
   register: cbrxd_test
   ignore_errors: yes
 
-- block:
+- name: install cambrionix
+  block:
     - name: search cambrionix package
       win_find:
         paths: "{{ installation_folder }}\\bin\\cambrionix"
