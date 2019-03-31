@@ -16,7 +16,7 @@
   - installer_file_name
   - s3_download_url
   - launcher_file_name
-  - extra_app_props
+  - application_properties
 
 # required dependencies
 
@@ -129,17 +129,8 @@
   win_lineinfile:
     path: "{{ installation_folder }}\\conf\\application.properties"
     line: "{{ item.key }}={{ item.value }}"
-    regexp: "^{{ item.key | replace('.', '\\.') }}="
-  with_dict:
-    - "server.port": "{{ server_port }}"
-  become: yes
-
-- name: update custom application properties file (optional)
-  lineinfile:
-    path: "{{ installation_folder }}\\conf\\application.properties"
-    line: "{{ item.key }}={{ item.value }}"
-    regexp: "^{{ item.key | replace('.', '\\.') }}="
-  with_dict: "{{ extra_app_props | default({}) }}"
+    regexp: "^{{ item.key }}="
+  with_dict: "{{ application_properties }}"
   become: yes
 
 - name: update server port

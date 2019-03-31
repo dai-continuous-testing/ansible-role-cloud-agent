@@ -17,7 +17,7 @@ Role Variables
 | state | should the application be present or absent | present, absent | present | no |
 | app_version | application version to install | string | 12.4.5373 | no |
 | server_port | port number for the server | number | 8081 | no |
-| extra_app_props | additional props to be override in application.properties file | dict | {} | no |
+| extra_application_properties | additional props to be override in application.properties file | dict | {} | no |
 | installation_folder | the folder in which the applction will be installed | string | for mac: ~/experitest/cloud-agent-version <br> for windows: C:\\Experitest\\cloud-agent  | no |
 | jmx_port | port number for jmx inspection | number | 51235 | no |
 | custom_download_url | custom url to download the installation from (zip format) | string |  | no |
@@ -29,26 +29,3 @@ Example Playbook
 ----------------
 
 #### [see working example](/example)
-
-In requirements.yml file
-
-    - src: git+https://github.com/ExperitestOfficial/ansible-role-cloud-agent.git
-      version: master
-      name: cloud-agent
-
-
-In site.yml file
-
-    - hosts: cloud-agents
-      roles:
-        - role: cloud-agent
-          state: present
-          app_version: 12.3.866
-
-To invoke, run the following commands:
-
-- install dependencies \
-  *ansible-galaxy install -r requirements.yml*
-
-- run the playbook \
-  *ansible-playbook site.yml*

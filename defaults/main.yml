@@ -9,7 +9,15 @@ main_class: "com.experitest.cloudagent.MainForwarder"
 server_port: 8081
 jmx_port: 51235
 
-extra_app_props: {}
+base_application_properties:
+  - "server.port": "{{ server_port }}"
+  - "spring.datasource.url": "{{ db_connection_string }}"
+  - "spring.datasource.username": "{{ db_username }}"
+  - "spring.datasource.password": "{{ db_password }}"
+
+extra_application_properties: {}
+
+application_properties: "{{ base_application_properties | combine(extra_application_properties) }}"
 
 start_after_install: True
 
