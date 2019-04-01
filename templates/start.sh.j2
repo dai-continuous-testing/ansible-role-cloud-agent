@@ -1,16 +1,10 @@
 #!/bin/sh
 
-# function loadVmOptions() {
-#     FILENAME=$1
-#     cat $FILENAME | grep -v ^\#.*$ | tr '\n' ' '
-# }
-
-# VMOPTIONS=$(loadVmOptions start.vmoptions)
-
 JAVA_PATH=$(/usr/libexec/java_home -v 1.8)
 JAVA_BIN=$JAVA_PATH/bin/java
 
 $JAVA_BIN -cp ".:lib/*" \
+    {{ java_options | join(' ') }} \
     -Xmx2048m \
     -XX:+HeapDumpOnOutOfMemoryError \
     -XX:HeapDumpPath=./logs \
@@ -22,7 +16,6 @@ $JAVA_BIN -cp ".:lib/*" \
     -Djdk.nio.maxCachedBufferSize=262144 \
     -Djava.net.preferIPv4Stack=true \
     -Djava.library.path=./:./bin:./bin/native/darwin \
-    -Dallow.cors=true \
     -Dcom.sun.management.jmxremote \
     -Dcom.sun.management.jmxremote.port={{ jmx_port }} \
     -Dcom.sun.management.jmxremote.ssl=false \
