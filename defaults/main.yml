@@ -13,9 +13,6 @@ jmx_port: 51235
 
 base_application_properties:
   - "server.port": "{{ server_port }}"
-  - "spring.datasource.url": "{{ db_connection_string }}"
-  - "spring.datasource.username": "{{ db_username }}"
-  - "spring.datasource.password": "{{ db_password }}"
 
 extra_application_properties: {}
 
