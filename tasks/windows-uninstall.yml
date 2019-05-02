@@ -3,7 +3,7 @@
   assert: { that: "{{ item }} != '' " }
   with_items:
   - service_name
-  - installation_folder
+  - installation_root_folder
   - temp_folder
 
 - name: stop the old service
@@ -12,6 +12,34 @@
     state: absent
   become: yes
 
+- name: remove temp folder
+  win_file:
+    path: "{{ temp_folder }}"
+    state: absent
+  when: clear_temp_folder | default('no') | bool
+
+- name: remove tracking files
+  win_file: 
+    path: "{{ installation_root_folder }}\\{{ item }}"
+    state: absent
+  with_items:
+    - "{{ app_name }}-previous"
+    - "{{ app_name }}-current"
+
+- name: find app versions
+  win_find:
+    paths: "{{ installation_root_folder }}"
+    file_type: directory
+  register: application_versions
+
+- name: remove application versions
+  win_file:
+    path: "{{ item.path }}"
+    state: absent
+  with_items: "{{ application_versions.files }}"
+  when: 
+    - item.path | win_basename | regex_search("{{ app_name }}-")
+
 - name: kill adb processes
   win_shell: |
     taskkill /IM adb.exe /F
@@ -19,18 +47,3 @@
   changed_when: killadbresults.rc == 0 and 'The process "adb.exe" not found.' not in killadbresults.stderr
   failed_when: killadbresults.rc != 0 and 'The process "adb.exe" not found.' not in killadbresults.stderr
   become: yes
-
-- name: uninstall cambrionix api
-  win_command: '"{{ cambrionix_api_path }}\\uninstall.exe" /S'
-  ignore_errors: yes
-
-- name: remove installation folder
-  win_file: 
-    path: "{{ installation_folder }}"
-    state: absent
-
-- name: remove temp folder
-  win_file:
-    path: "{{ temp_folder }}"
-    state: absent
-  when: clear_temp_folder | default('no') | bool
