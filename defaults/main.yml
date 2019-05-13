@@ -1,7 +1,7 @@
 ---
 
 app_name: cloudagent
-app_version: 12.4.5373
+app_version: 12.5.5989
 
 service_name: "com.experitest.{{ app_name }}"
 main_class: "com.experitest.cloudagent.MainForwarder"
