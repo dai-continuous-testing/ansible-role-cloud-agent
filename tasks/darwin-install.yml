@@ -139,12 +139,14 @@
   with_dict: "{{ application_properties }}"
   become: yes
 
-- name: update server port
+- name: update xml conf
   lineinfile:
     state: present
     path: "{{ installation_folder }}/conf/cloudagent.conf.xml"
-    line: "<main-port>{{ server_port }}</main-port>"
-    regexp: "<main-port>\\d*<\\/main-port>"
+    line: "<{{ item.key }}>{{ item.value }}</{{ item.key }}>"
+    regexp: "<{{ item.key }}>.*<\\/{{ item.key }}>"
+    insertbefore:  "<\\/forwarder-configuration>"
+  with_dict: "{{ xml_conf }}"
   become: yes
 
 - name: set permissions for logs folder
