@@ -12,6 +12,14 @@
     state: absent
   become: yes
 
+- name: kill adb processes
+  win_shell: |
+    taskkill /IM adb.exe /F
+  register: killadbresults
+  changed_when: killadbresults.rc == 0 and 'The process "adb.exe" not found.' not in killadbresults.stderr
+  failed_when: killadbresults.rc != 0 and 'The process "adb.exe" not found.' not in killadbresults.stderr
+  become: yes
+
 - name: remove temp folder
   win_file:
     path: "{{ temp_folder }}"
@@ -39,11 +47,3 @@
   with_items: "{{ application_versions.files }}"
   when: 
     - item.path | win_basename | regex_search("{{ app_name }}-")
-
-- name: kill adb processes
-  win_shell: |
-    taskkill /IM adb.exe /F
-  register: killadbresults
-  changed_when: killadbresults.rc == 0 and 'The process "adb.exe" not found.' not in killadbresults.stderr
-  failed_when: killadbresults.rc != 0 and 'The process "adb.exe" not found.' not in killadbresults.stderr
-  become: yes
