@@ -154,6 +154,14 @@
   with_dict: "{{ xml_conf }}"
   become: yes
 
+- name: update log4j properties file
+  win_lineinfile:
+    path: "{{ installation_folder }}\\conf\\grid-log4j.properties"
+    line: "{{ item.key }}={{ item.value }}"
+    regexp: "^{{ item.key | replace('.', '\\.') }}="
+  with_dict: "{{ log4j_properties }}"
+  become: yes
+
 - name: set permissions for logs folder
   win_file:
     path: "{{ installation_folder }}\\logs"
