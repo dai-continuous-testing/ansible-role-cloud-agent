@@ -37,6 +37,13 @@ xml_conf: "{{ base_xml_conf | combine(extra_xml_conf) }}"
 
 #
 
+extra_log4j_properties: {}
+
+log4j_properties: "{{ extra_log4j_properties }}"
+
+
+#
+
 start_after_install: True
 
 clear_temp_folder: False

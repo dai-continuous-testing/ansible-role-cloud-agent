@@ -149,6 +149,14 @@
   with_dict: "{{ xml_conf }}"
   become: yes
 
+- name: update log4j properties file
+  lineinfile:
+    path: "{{ installation_folder }}/conf/grid-log4j.properties"
+    line: "{{ item.key }}={{ item.value }}"
+    regexp: "^{{ item.key | replace('.', '\\.') }}="
+  with_dict: "{{ log4j_properties }}"
+  become: yes
+
 - name: set permissions for logs folder
   file:
     path: "{{ installation_folder }}/logs"
@@ -175,15 +183,6 @@
   command: "/usr/sbin/installer -allowUntrusted -verboseR -dumplog -pkg {{ cmbx_installer.files[0].path }} -target /"
   ignore_errors: True
   become: yes
-
-# clear temp files (optional)
-
-- name: clear temp folder
-  file:
-    path: "{{ temp_folder }}"
-    state: absent
-  become: yes
-  when: clear_temp_folder | default('no') | bool
 
 # expose role output
 
