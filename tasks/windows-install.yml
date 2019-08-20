@@ -43,10 +43,11 @@
     - /install
     - /passive
     - /norestart
+  ignore_errors: yes
 
-- name: install vcredist2013 dependency
-  win_chocolatey:
-    name: vcredist2013
+# - name: install vcredist2013 dependency
+#   win_chocolatey:
+#     name: vcredist2013
 
 - name: make sure java is installed on the machine
   win_command: java -version
