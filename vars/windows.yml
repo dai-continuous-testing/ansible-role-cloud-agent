@@ -14,3 +14,11 @@ relative_path: "cloud-agent/windows"
 launcher_file_name: "start.bat"
 
 cambrionix_api_path: "C:\\Program Files (x86)\\Cambrionix\\Cambrionix API"
+
+java_download_filename: "{{ java_version }}-windows.zip"
+
+java_relative_path: "java/windows"
+
+java_installation_folder: "c:\\java"
+
+java_bin: "{{ java_installation_folder }}\\{{ java_version }}\\bin\\java.exe"
