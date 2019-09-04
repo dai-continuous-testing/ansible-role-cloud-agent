@@ -47,7 +47,7 @@
 - name: unzip java file
   command: "tar -xzvf {{ temp_folder }}/{{ java_download_filename }} -C {{ java_installation_folder }}"
   args:
-    creates: "{{ java_installation_folder }}/jre{{ java_version }}.jre/Contents/Home/bin"
+    creates: "{{ java_bin }}"
   become: yes
 
 - name: make sure java is installed on the machine
