@@ -42,7 +42,6 @@
   file:
     path: "{{ java_installation_folder }}"
     state: directory
-    owner: "{{ ansible_user_id }}"
   become: yes
 
 - name: unzip java file
@@ -50,24 +49,15 @@
     src: "{{ temp_folder }}/{{ java_download_filename }}"
     dest: "{{ java_installation_folder }}"
     remote_src: yes
-    creates: "{{ java_installation_folder }}/{{ java_version }}/Contents/Home/bin"
-    owner: "{{ ansible_user_id }}"
-  become: yes
-
-- name: add permission to java bin
-  file:
-    path: "{{ java_installation_folder }}/{{ java_version }}/Contents/Home/bin"
-    state: directory
-    recurse: yes
-    mode: '0777'
-    owner: "{{ ansible_user_id }}"
+    creates: "{{ java_installation_folder }}/jre{{ java_version }}.jre/Contents/Home/bin"
   become: yes
 
 - name: make sure java is installed on the machine
   command: "{{ java_bin }} -version"
   register: java_test
+  become: yes
   ignore_errors: yes
-
+  
 - name: fail if java is not found
   fail:
     msg: java must be accesible in path
