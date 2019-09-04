@@ -45,10 +45,8 @@
   become: yes
 
 - name: unzip java file
-  unarchive:
-    src: "{{ temp_folder }}/{{ java_download_filename }}"
-    dest: "{{ java_installation_folder }}"
-    remote_src: yes
+  command: "tar -xzvf {{ temp_folder }}/{{ java_download_filename }} -C {{ java_installation_folder }}"
+  args:
     creates: "{{ java_installation_folder }}/jre{{ java_version }}.jre/Contents/Home/bin"
   become: yes
 
