@@ -23,6 +23,7 @@ Role Variables
 | extra_java_options | extand java options | array of strings | [] | no |
 | installation_folder | the folder in which the applction will be installed | string | for mac: /Applications/Experitest/cloud-agent-version <br> for windows: C:\\Experitest\\cloud-agent-version  | no |
 | jmx_port | port number for jmx inspection | number | 51235 | no |
+| java_version | java jre version to install | string | 1.8.0_181 | no |
 | custom_download_url | custom url to download the installation from (zip format) | string |  | no |
 | start_after_install | should application start after installation is completed | boolean | True | no |
 | clear_temp_folder | remove temp folder after installation | boolean | False | no |
