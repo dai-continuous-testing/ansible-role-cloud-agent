@@ -44,6 +44,11 @@ extra_log4j_properties: {}
 
 log4j_properties: "{{ extra_log4j_properties }}"
 
+#
+
+extra_logback_properties: {}
+
+logback_properties: "{{ extra_logback_properties }}"
 
 #
 
