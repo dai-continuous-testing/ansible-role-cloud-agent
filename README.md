@@ -20,6 +20,7 @@ Role Variables
 | extra_application_properties | additional props to be override in application.properties file | dict | {} | no |
 | extra_xml_conf | extand xml configuration | dict | {} | no |
 | extra_log4j_properties | additional props to be override in grid-log4j.properties file | dict | {} | no |
+| extra_logback_properties | additional props to be override in logback.properties file | dict | {} | no |
 | extra_java_options | extand java options | array of strings | [] | no |
 | installation_folder | the folder in which the applction will be installed | string | for mac: /Applications/Experitest/cloud-agent-version <br> for windows: C:\\Experitest\\cloud-agent-version  | no |
 | jmx_port | port number for jmx inspection | number | 51235 | no |
@@ -28,6 +29,7 @@ Role Variables
 | start_after_install | should application start after installation is completed | boolean | True | no |
 | clear_temp_folder | remove temp folder after installation | boolean | False | no |
 | clear_before_install | removing old installation before installing new version | boolean | False | no |
+| kill_notepad | kill notepad/notepadd++ apps on windows | boolean | False | no |
 
 Example Playbook
 ----------------
