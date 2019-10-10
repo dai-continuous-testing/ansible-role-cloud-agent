@@ -199,6 +199,21 @@
     state: absent
   become: yes
 
+# set permission to zipalign file
+
+- name: check the zipalign file exists
+  stat:
+    path: "{{ installation_folder }}/bin/adb/js/darwin/zipalign"
+  register: zipalign_exists
+
+- name: set permissions to zipalign file
+  file:
+    path: "{{ installation_folder }}/bin/adb/js/darwin/zipalign"
+    state: file
+    mode: 0777
+  become: yes
+  when: zipalign_exists.stat.exists
+  
 # install cambrionix package
 
 - name: search cambrionix package
