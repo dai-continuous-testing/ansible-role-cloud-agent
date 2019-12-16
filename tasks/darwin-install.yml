@@ -19,7 +19,7 @@
   - launcher_file_name
   - application_properties
   - extra_java_options
-  - installer_checksum
+#  - installer_checksum
 
 
 # set temp folder
@@ -49,7 +49,7 @@
 - name: validate checksum and download zip from s3 url
   get_url:
     url: "{{ s3_download_url }}"
-    checksum: "sha256: {{ installer_checksum }}"
+  #  checksum: "sha256: {{ installer_checksum }}"
     dest: "{{ temp_folder }}/{{ installer_file_name }}"
     timeout: "{{ download_timeout | default(60) }}"
   when: custom_download_url == ""
@@ -57,7 +57,7 @@
 - name: validate checksum and download zip from custom url
   get_url:
     url: "{{ custom_download_url }}"
-    checksum: "sha256: {{ installer_checksum }}"
+  #  checksum: "sha256: {{ installer_checksum }}"
     dest: "{{ temp_folder }}/{{ installer_file_name }}"
     timeout: "{{ download_timeout | default(60) }}"
   when: custom_download_url != ""
