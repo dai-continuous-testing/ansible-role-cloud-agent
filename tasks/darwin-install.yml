@@ -76,6 +76,15 @@
   failed_when: killadbresults.rc != 0 and killadbresults.rc != 1
   become: yes
 
+- name: kill java processes
+  shell: |
+    killall java
+  register: killjavaresults
+  changed_when: killjavaresults.rc == 0
+  failed_when: killjavaresults.rc != 0 and killjavaresults.rc != 1
+  become: yes
+  ignore_errors: yes
+
 # delete old installation (optional)
 
 - name: clear old installation folder
