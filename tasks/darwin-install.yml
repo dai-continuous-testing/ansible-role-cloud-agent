@@ -77,7 +77,7 @@
   become: yes
 
 - name: Get running jmx processes
-  shell: "ps -ef | grep -v grep | grep -w {{ jmx_port }} | awk '{print $2}'"
+  shell: "ps -ef | grep -v grep | grep {{ jmx_port }} | awk '{print $2}'"
   register: running_processes
   become: yes
 
