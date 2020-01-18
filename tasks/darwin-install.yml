@@ -76,6 +76,17 @@
   failed_when: killadbresults.rc != 0 and killadbresults.rc != 1
   become: yes
 
+- name: Get running jmx processes
+  shell: "ps -ef | grep -v grep | grep {{ jmx_port }} | awk '{print $2}'"
+  register: running_processes
+  become: yes
+
+- name: Kill running jmx processes
+  shell: "kill -9 {{ item }}"
+  with_items: "{{ running_processes.stdout_lines }}"
+  become: yes
+  ignore_errors: yes
+
 # delete old installation (optional)
 
 - name: clear old installation folder
@@ -244,3 +255,4 @@
       installation_folder: "{{ installation_folder }}"
       configuration_file: "{{ installation_folder }}/conf/application.properties"
       configuration_xml_file: "{{ installation_folder }}/conf/cloudagent.conf.xml"
+      service_plist_file_path: "{{ service_plist_file_path }}"
