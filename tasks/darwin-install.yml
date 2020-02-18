@@ -238,8 +238,15 @@
 
 - name: start the installation for cambrionix tools
   command: "/usr/sbin/installer -allowUntrusted -verboseR -dumplog -pkg {{ cmbx_installer.files[0].path }} -target /"
-  ignore_errors: True
   become: yes
+  ignore_errors: yes
+
+# fixed xcode select
+
+- name: Fix xcode select
+  shell: xcode-select -s /Applications/Xcode.app/Contents/Developer/
+  become: yes
+  ignore_errors: yes
 
 # expose role output
 
