@@ -237,7 +237,7 @@
   register: cmbx_installer
 
 - name: start the installation for cambrionix tools
-  shell: "/usr/sbin/installer -allowUntrusted -verboseR -dumplog -pkg {{ cmbx_installer.files[0].path }} -target /"
+  command: "/usr/sbin/installer -allowUntrusted -verboseR -dumplog -pkg {{ cmbx_installer.files[0].path }} -target /"
   async: 300
   poll: 0
   register: installer_cbrxd
