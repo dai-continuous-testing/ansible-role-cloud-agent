@@ -237,8 +237,20 @@
   register: cmbx_installer
 
 - name: start the installation for cambrionix tools
-  command: "/usr/sbin/installer -allowUntrusted -verboseR -dumplog -pkg {{ cmbx_installer.files[0].path }} -target /"
+  shell: "/usr/sbin/installer -allowUntrusted -verboseR -dumplog -pkg {{ cmbx_installer.files[0].path }} -target /"
+  async: 300
+  poll: 0
+  register: installer_cbrxd
   become: yes
+  ignore_errors: yes
+
+- name: wait for installer cambrionix
+  async_status:
+    jid: "{{ installer_cbrxd.ansible_job_id }}"
+  register: wait_for_installer_cbrxd
+  until: wait_for_installer_cbrxd.finished
+  retries: 30
+  delay: 10
   ignore_errors: yes
 
 # fixed xcode select
