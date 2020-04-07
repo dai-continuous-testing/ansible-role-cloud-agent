@@ -230,28 +230,40 @@
   
 # install cambrionix package
 
-- name: search cambrionix package
-  find:
-    paths: "{{ installation_folder }}/bin/cambrionix"
-    patterns: '*.pkg'
-  register: cmbx_installer
-
-- name: start the installation for cambrionix tools
-  command: "/usr/sbin/installer -allowUntrusted -verboseR -dumplog -pkg {{ cmbx_installer.files[0].path }} -target /"
-  async: 300
-  poll: 0
-  register: installer_cbrxd
+- name: check if cambrionix api is installed on the machine
+  command: "/usr/local/sbin/cbrxd --version"
+  register: cbrxd_test
   become: yes
   ignore_errors: yes
+  
 
-- name: wait for installer cambrionix
-  async_status:
-    jid: "{{ installer_cbrxd.ansible_job_id }}"
-  register: wait_for_installer_cbrxd
-  until: wait_for_installer_cbrxd.finished
-  retries: 30
-  delay: 10
-  ignore_errors: yes
+- name: install cambrionix
+  block:
+
+    - name: search cambrionix package
+      find:
+        paths: "{{ installation_folder }}/bin/cambrionix"
+        patterns: '*.pkg'
+      register: cmbx_installer
+    
+    - name: start the installation for cambrionix tools
+      command: "/usr/sbin/installer -allowUntrusted -verboseR -dumplog -pkg {{ cmbx_installer.files[0].path }} -target /"
+      async: 300
+      poll: 0
+      register: installer_cbrxd
+      become: yes
+      ignore_errors: yes
+    
+    - name: wait for installer cambrionix
+      async_status:
+        jid: "{{ installer_cbrxd.ansible_job_id }}"
+      register: wait_for_installer_cbrxd
+      until: wait_for_installer_cbrxd.finished
+      retries: 30
+      delay: 10
+      ignore_errors: yes
+
+  when: cbrxd_test.rc != 0
 
 # fixed xcode select
 
