@@ -304,8 +304,8 @@
     paths: "{{ installation_folder }}\\bin\\cambrionix"
     patterns: '*.exe'
   register: cmbx_installer
-  
 
+  
 - name: verify cambrionix version if installed
   block:
 
@@ -313,13 +313,13 @@
       set_fact:
         cbrx_versplit: "{{ cbrxd_test.stdout_lines[0].split(' ') }}"
 
-    - name: get the installed cambrionix version
+    - name: get the converted installed cambrionix version
       set_fact:
         cbrx_inst_ver: "{{ cbrx_versplit[1] }}b{{ cbrx_versplit[3] }}"
     
     - name: get the cambrionix installer file version
       set_fact:
-        cbrx_file_ver: "{{ (cmbx_installer.files[0].filename | splitext)[0].split('_')[2] }}"
+        cbrx_file_ver: "{{ (cmbx_installer.files[0].path | basename | splitext)[0].split('_')[2] }}"
 
     - name: print cambrionix currently installed and installer file version
       debug:

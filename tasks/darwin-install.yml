@@ -236,15 +236,47 @@
   become: yes
   ignore_errors: yes
   
+- name: search cambrionix package
+  find:
+    paths: "{{ installation_folder }}/bin/cambrionix"
+    patterns: '*.pkg'
+  register: cmbx_installer
+
+- name: verify cambrionix version if installed
+  block:
+
+    - name: split the cbrxd_test
+      set_fact:
+        cbrx_versplit: "{{ cbrxd_test.stdout_lines[0].split(' ') }}"
+
+      # temp logic as dot is missing in filename
+    - name: split the cbrx_versplit major version
+      set_fact:
+        cbrx_majorver: "{{ cbrx_versplit[1].split('.') }}"
+
+    - name: get the converted installed cambrionix version
+      set_fact:
+        cbrx_inst_ver: "{{ cbrx_majorver[0] }}.{{ cbrx_majorver[1] }}{{ cbrx_majorver[2] }}b{{ cbrx_versplit[3] }}"
+    
+    - name: get the cambrionix installer file version
+      set_fact:
+        cbrx_file_ver: "{{ (cmbx_installer.files[0].path | basename | splitext)[0].split('_')[1] }}"
+
+    - name: print cambrionix currently installed and installer file version
+      debug:
+        msg: "Installed Version: {{cbrx_inst_ver}} and Installer File Verison: {{cbrx_file_ver}}"
+
+    - name: reset the cbrxd status to 1 if cambrionix has different version than installer file
+      set_fact:
+        cbrxd_test:
+          rc: 1
+      when: cbrx_inst_ver != cbrx_file_ver
+
+  when: cbrxd_test.rc == 0
+
 
 - name: install cambrionix
   block:
-
-    - name: search cambrionix package
-      find:
-        paths: "{{ installation_folder }}/bin/cambrionix"
-        patterns: '*.pkg'
-      register: cmbx_installer
     
     - name: start the installation for cambrionix tools
       command: "/usr/sbin/installer -allowUntrusted -verboseR -dumplog -pkg {{ cmbx_installer.files[0].path }} -target /"
