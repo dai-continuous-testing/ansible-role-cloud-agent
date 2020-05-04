@@ -323,7 +323,14 @@
 
     - name: print cambrionix currently installed and installer file version
       debug:
-        msg: "Installed Version: {{cbrx_inst_ver}} and Installer File Verison: {{cbrx_file_ver}}"
+        msg: "Installed Version: {{cbrx_inst_ver}} and Installer File Verison: {{cbrx_file_ver}} is same."
+      when: cbrx_inst_ver == cbrx_file_ver
+      
+    - name: print if cambrionix version is mismatched
+      fail:
+        msg: "[Warning]: Installed Version: {{cbrx_inst_ver}} and Installer File Verison: {{cbrx_file_ver}} is different. Installing from file version..."
+      ignore_errors: yes
+      when: cbrx_inst_ver != cbrx_file_ver
 
     - name: uninstall cambrionix if found differen version than installer file
       win_command: '"{{ cambrionix_api_path }}\\uninstall.exe" /S'
