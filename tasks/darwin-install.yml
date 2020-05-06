@@ -286,10 +286,13 @@
   block:
     
     - name: start the installation for cambrionix tools
-      command: "/usr/sbin/installer -allowUntrusted -verboseR -dumplog -pkg {{ cmbx_installer.files[0].path }} -target /"
+      shell: "/usr/sbin/installer -allowUntrusted -verboseR -dumplog -pkg {{ cmbx_installer.files[0].path }} -target /"
+      args:
+        executable: /bin/bash
       async: 300
       poll: 0
       register: installer_cbrxd
+      become_user: "{{ ansible_user_id }}"
       become: yes
       ignore_errors: yes
     
