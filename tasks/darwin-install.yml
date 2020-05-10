@@ -269,7 +269,7 @@
     
     - name: print if cambrionix version is mismatched
       fail:
-        msg: "[Warning]: Installed Version: {{cbrx_inst_ver}} and Installer File Verison: {{cbrx_file_ver}} is different. Installing from file version..."
+        msg: "[Warning]: Installed Version: {{cbrx_inst_ver}} and Installer File Verison: {{cbrx_file_ver}} is different. Installing from file version now..."
       ignore_errors: yes
       when: cbrx_inst_ver != cbrx_file_ver
 
@@ -292,7 +292,6 @@
       async: 300
       poll: 0
       register: installer_cbrxd
-      become_user: "{{ ansible_user_id }}"
       become: yes
       ignore_errors: yes
     
@@ -303,6 +302,7 @@
       until: wait_for_installer_cbrxd.finished
       retries: 30
       delay: 10
+      become: yes
       ignore_errors: yes
 
   when: cbrxd_test.rc != 0
