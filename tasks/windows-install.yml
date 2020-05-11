@@ -298,15 +298,69 @@
   win_command: '"{{ cambrionix_api_path }}\\cbrxd.exe" --version'
   register: cbrxd_test
   ignore_errors: yes
+  
+- name: search cambrionix package from installation folder
+  win_find:
+    paths: "{{ installation_folder }}\\bin\\cambrionix"
+    patterns: '*.exe'
+  register: cmbx_installer
 
-- name: install cambrionix
+  
+- name: verify cambrionix version if installed
   block:
-    - name: search cambrionix package
-      win_find:
-        paths: "{{ installation_folder }}\\bin\\cambrionix"
-        patterns: '*.exe'
-      register: cmbx_installer
+
+    - name: split the cbrxd_test
+      set_fact:
+        cbrx_versplit: "{{ cbrxd_test.stdout_lines[0].split(' ') }}"
+
+    - name: get the converted installed cambrionix version
+      set_fact:
+        cbrx_inst_ver: "{{ cbrx_versplit[1] }}b{{ cbrx_versplit[3] }}"
     
+    - name: get the cambrionix installer file version
+      set_fact:
+        cbrx_file_ver: "{{ (cmbx_installer.files[0].path | basename | splitext)[0].split('_')[2] }}"
+
+    - name: print cambrionix currently installed and installer file version
+      debug:
+        msg: "Installed Version: {{cbrx_inst_ver}} and Installer File Verison: {{cbrx_file_ver}} is same."
+      when: cbrx_inst_ver == cbrx_file_ver
+      
+    - name: print if cambrionix version is mismatched
+      fail:
+        msg: "[Warning]: Installed Version: {{cbrx_inst_ver}} and Installer File Verison: {{cbrx_file_ver}} is different. Installing from file version..."
+      ignore_errors: yes
+      when: cbrx_inst_ver != cbrx_file_ver
+
+    - name: uninstall cambrionix if found differen version than installer file
+      win_command: '"{{ cambrionix_api_path }}\\uninstall.exe" /S'
+      async: 300
+      poll: 0
+      become: yes
+      register: uninstall_cbrxd
+      when: cbrx_inst_ver != cbrx_file_ver
+
+    - name: wait for uninstalling cambrionix
+      async_status:
+        jid: "{{ uninstall_cbrxd.ansible_job_id }}"
+      register: wait_for_installer_cbrxd
+      until: wait_for_installer_cbrxd.finished
+      retries: 30
+      delay: 10
+      ignore_errors: yes
+      when: cbrx_inst_ver != cbrx_file_ver
+
+    - name: reset the cbrxd status to 1 if cambrionix has different version than installer file
+      set_fact:
+        cbrxd_test:
+          rc: 1
+      when: cbrx_inst_ver != cbrx_file_ver
+
+  when: cbrxd_test.rc == 0
+
+- name: install cambrionix if not installed
+  block:
+   
     - name: start the installation for cambrionix tools
       win_command: "{{ cmbx_installer.files[0].path }} /S"
       async: 300
