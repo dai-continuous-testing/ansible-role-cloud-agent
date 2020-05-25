@@ -7,6 +7,8 @@ required_modifiable_fields:
   - installation_root_folder
   - java_version
   - installer_checksum
+  - custom_download_username
+  - custom_download_password
 
 app_name: cloudagent
 __app_version: 12.12.7908
