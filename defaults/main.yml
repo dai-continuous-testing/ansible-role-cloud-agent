@@ -7,6 +7,8 @@ required_modifiable_fields:
   - installation_root_folder
   - java_version
   - installer_checksum
+  - deployment_mode
+  - shared_storage_folder
 
 app_name: cloudagent
 __app_version: 12.12.7908
@@ -16,6 +18,8 @@ windows_installer_checksum: "b220d615a139e10e486d01f1662214063a2724441a4bf62b714
 
 service_name: "com.experitest.{{ app_name }}"
 main_class: "com.experitest.cloudagent.MainForwarder"
+
+__deployment_mode: online
 
 extra_java_options: []
 

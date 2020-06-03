@@ -46,21 +46,31 @@
 
 # download the file
 
-- name: validate checksum and download zip from s3 url
-  get_url:
-    url: "{{ s3_download_url }}"
-  #  checksum: "sha256: {{ installer_checksum }}"
-    dest: "{{ temp_folder }}/{{ installer_file_name }}"
-    timeout: "{{ download_timeout | default(60) }}"
-  when: custom_download_url == ""
+- name: download zip from internet
+  block:
 
-- name: validate checksum and download zip from custom url
-  get_url:
-    url: "{{ custom_download_url }}"
-  #  checksum: "sha256: {{ installer_checksum }}"
+    - name: download zip from s3 url
+      get_url:
+        url: "{{ s3_download_url }}"
+        dest: "{{ temp_folder }}/{{ installer_file_name }}"
+        timeout: "{{ download_timeout | default(60) }}"
+      when: custom_download_url == ""
+    
+    - name: download zip from custom url
+      get_url:
+        url: "{{ custom_download_url }}"
+        dest: "{{ temp_folder }}/{{ installer_file_name }}"
+        timeout: "{{ download_timeout | default(60) }}"
+      when: custom_download_url != ""
+
+  when: deployment_mode == "online"
+
+- name: download zip from shared storage folder
+  copy:
+    src: "{{ shared_storage_folder }}/{{ relative_path }}/{{ installer_file_name }}"
     dest: "{{ temp_folder }}/{{ installer_file_name }}"
-    timeout: "{{ download_timeout | default(60) }}"
-  when: custom_download_url != ""
+    remote_src: no
+  when: deployment_mode == "offline"
 
 # stop old service
 
