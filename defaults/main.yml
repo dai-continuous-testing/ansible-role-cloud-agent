@@ -65,6 +65,8 @@ clear_before_install: False
 
 kill_notepad: False
 
+maintain_supervision_files: False
+
 convention: "Agent"
 
 custom_download_url: ""

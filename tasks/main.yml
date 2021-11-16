@@ -19,6 +19,12 @@
   include_tasks: "tasks/{{ ansible_os_family | os_family_to_os_type }}-remove-archived.yml"
   when: state|default('present') == 'present'
 
+- name: maintain supervision files
+  include_tasks: "tasks/{{ ansible_os_family | os_family_to_os_type }}-maintain-supervision.yml"
+  when: 
+    - state|default('present') == 'present'
+    - maintain_supervision_files | default('no') | bool
+
 - name: uninstall
   include_tasks: "tasks/{{ ansible_os_family | os_family_to_os_type }}-uninstall.yml"
   when: state|default('present') == 'absent'

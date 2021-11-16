@@ -1,0 +1,49 @@
+---
+
+# validation
+
+- name: assert all vars are set
+  assert: { that: "{{ item }} != '' " }
+  with_items:
+  - installation_root_folder
+  - app_name
+  - installation_folder
+
+# maintain supervision
+
+- name: check for previous installation exists
+  win_stat:
+    path: "{{ installation_root_folder }}\\{{ app_name }}-previous"
+  register: previous_exists
+
+- name: get the previous supervision if exists
+  block:
+
+    - name: load previous_version from remote file
+      slurp:
+        src: "{{ installation_root_folder }}/{{ app_name }}-previous"
+      register: previous_file
+         
+    - name: set previous_version from remote file
+      set_fact:
+        previous_version: "{{ previous_file['content'] | b64decode }}"
+  
+    - name: check for previous supervision files exists
+      win_stat:
+        path: "{{ installation_root_folder }}\\{{ app_name }}-{{ previous_version }}\\conf\\supervision"
+      register: previous_supervision
+
+    - name: Copy supervision files to current installation
+      win_copy:
+        src: "{{ installation_root_folder }}\\{{ app_name }}-{{ previous_version }\\conf\\supervision"
+        dest: "{{ installation_folder }}\\conf"
+        remote_src: yes
+        force: yes
+      become: yes
+      when: previous_supervision.stat.exists
+
+  become: yes
+  when: 
+    - previous_exists.stat.exists
+
+
