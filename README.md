@@ -19,7 +19,7 @@ Role Variables
 | server_port | port number for the server | number | 8081 | no |
 | extra_application_properties | additional props to be override in application.properties file | dict | {} | no |
 | extra_xml_conf | extand xml configuration | dict | {} | no |
-| extra_log4j_properties | additional props to be override in grid-log4j.properties file | dict | {} | no |
+| extra_grid_logback_properties | additional props to be override in grid-logback.properties file | dict | {} | no |
 | extra_logback_properties | additional props to be override in logback.properties file | dict | {} | no |
 | extra_java_options | extand java options | array of strings | [] | no |
 | installer_checksum | sha256 hash value to download and check the integrity of the installer file, to get hash value refer release notes | string |  | no |

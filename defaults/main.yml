@@ -46,9 +46,9 @@ xml_conf: "{{ base_xml_conf | combine(extra_xml_conf) }}"
 
 #
 
-extra_log4j_properties: {}
+extra_grid_logback_properties: {}
 
-log4j_properties: "{{ extra_log4j_properties }}"
+grid_logback_properties: "{{ extra_grid_logback_properties }}"
 
 #
 
