@@ -177,12 +177,12 @@
   with_dict: "{{ xml_conf }}"
   become: yes
 
-- name: update log4j properties file
+- name: update grid_logback_properties file
   lineinfile:
-    path: "{{ installation_folder }}/conf/grid-log4j.properties"
+    path: "{{ installation_folder }}/conf/grid-logback.properties"
     line: "{{ item.key }}={{ item.value }}"
     regexp: "^{{ item.key | replace('.', '\\.') }}="
-  with_dict: "{{ log4j_properties }}"
+  with_dict: "{{ grid_logback_properties }}"
   become: yes
 
 - name: update logback properties file
