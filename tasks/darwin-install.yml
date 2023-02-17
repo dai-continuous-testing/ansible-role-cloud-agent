@@ -2,7 +2,9 @@
 # validation
 
 - name: assert all vars are set
-  assert: { that: "{{ item }} != '' " }
+  assert: 
+    that: "{{ item }} != '' " 
+    quiet: true
   with_items:
   - app_name
   - clear_temp_folder
@@ -62,20 +64,6 @@
     timeout: "{{ download_timeout | default(60) }}"
   when: custom_download_url != ""
 
-# stop old service
-
-- name: stop the old service
-  command: "launchctl unload {{ service_plist_file_path }}"
-  become: yes
-
-- name: kill adb processes
-  shell: |
-    killall adb
-  register: killadbresults
-  changed_when: killadbresults.rc == 0
-  failed_when: killadbresults.rc != 0 and killadbresults.rc != 1
-  become: yes
-
 # delete old installation (optional)
 
 - name: clear old installation folder
@@ -83,8 +71,7 @@
     path: "{{ installation_folder }}"
     state: absent
   when: clear_before_install == True
-  notify:
-    - start the service
+  
 
 # unpack and copy all the files to the installation folder
 
@@ -114,16 +101,6 @@
 
 - name: copy the file to installation folder
   command: "cp -r {{ temp_folder }}/{{ (installer_file_name | splitext)[0] }}/{{ convention }}/ {{ installation_folder }}/"
-  become: yes
-  notify:
-    - start the service
-
-- name: copy plist
-  template:
-    src: service.plist.j2
-    dest: "{{ service_plist_file_path }}"
-    # in mac - plist owner is root
-    owner: root
   become: yes
 
 - name: copy start script
@@ -170,27 +147,10 @@
   with_dict: "{{ logback_properties }}"
   become: yes
 
-- name: make sure logs folder exists
-  file:
-    path: "{{ logs_folder }}"
-    state: directory
-    mode: 0777
-    owner: "{{ ansible_user_id }}"
-  become: yes
-
 - name: remove existing logs folder from installation folder
   file:
     path: "{{ installation_folder }}/logs"
     state: absent
-  become: yes
-
-- name: create sym link for logs folder
-  file:
-    src: "{{ logs_folder }}"
-    dest: "{{ installation_folder }}/logs"
-    state: link
-    mode: 0777
-    owner: "{{ ansible_user_id }}"
   become: yes
 
 - name: reset pairing key
@@ -232,103 +192,3 @@
   become: yes
   when: zipalign_exists.stat.exists
   
-# install cambrionix package
-
-- name: check if cambrionix api is installed on the machine
-  command: "/usr/local/sbin/cbrxd --version"
-  register: cbrxd_test
-  become: yes
-  ignore_errors: yes
-  
-- name: search cambrionix package
-  find:
-    paths: "{{ installation_folder }}/bin/cambrionix"
-    patterns: '*.pkg'
-  register: cmbx_installer
-
-- name: verify cambrionix version if installed
-  block:
-
-    - name: split the cbrxd_test
-      set_fact:
-        cbrx_versplit: "{{ cbrxd_test.stdout_lines[0].split(' ') }}"
-
-      # temp logic as dot is missing in filename
-    - name: split the cbrx_versplit major version
-      set_fact:
-        cbrx_majorver: "{{ cbrx_versplit[1].split('.') }}"
-
-    - name: get the converted installed cambrionix version
-      set_fact:
-        cbrx_inst_ver: "{{ cbrx_majorver[0] }}.{{ cbrx_majorver[1] }}{{ cbrx_majorver[2] }}b{{ cbrx_versplit[3] }}"
-    
-    - name: get the cambrionix installer file version
-      set_fact:
-        cbrx_file_ver: "{{ (cmbx_installer.files[0].path | basename | splitext)[0].split('_')[1] }}"
-
-    - name: print cambrionix currently installed and installer file version
-      debug:
-        msg: "Installed Version: {{cbrx_inst_ver}} and Installer File Verison: {{cbrx_file_ver}} is same."
-      when: cbrx_inst_ver == cbrx_file_ver
-    
-    - name: print if cambrionix version is mismatched
-      fail:
-        msg: "[Warning]: Installed Version: {{cbrx_inst_ver}} and Installer File Verison: {{cbrx_file_ver}} is different. Installing from file version now..."
-      ignore_errors: yes
-      when: cbrx_inst_ver != cbrx_file_ver
-
-    - name: reset the cbrxd status to 1 if cambrionix has different version than installer file
-      set_fact:
-        cbrxd_test:
-          rc: 1
-      when: cbrx_inst_ver != cbrx_file_ver
-
-  when: cbrxd_test.rc == 0
-
-
-- name: install cambrionix
-  block:
-    
-    - name: start the installation for cambrionix tools
-      shell: "/usr/sbin/installer -allowUntrusted -verboseR -dumplog -pkg {{ cmbx_installer.files[0].path }} -target /"
-      args:
-        executable: /bin/bash
-      async: 300
-      poll: 0
-      register: installer_cbrxd
-      become: yes
-      ignore_errors: yes
-    
-    - name: wait for installer cambrionix
-      async_status:
-        jid: "{{ installer_cbrxd.ansible_job_id }}"
-      register: wait_for_installer_cbrxd
-      until: wait_for_installer_cbrxd.finished
-      retries: 30
-      delay: 10
-      become: yes
-      ignore_errors: yes
-
-  when: cbrxd_test.rc != 0
-
-# fixed xcode select
-
-- name: Fix xcode select
-  shell: xcode-select -s /Applications/Xcode.app/Contents/Developer/
-  become: yes
-  ignore_errors: yes
-
-# expose role output
-
-- name: sanitize role name
-  set_fact:
-    sanitize_role_name: "{{ role_name | replace('-', '_') | regex_replace('([^A-Za-z0-9_])', '') | trim }}"
-
-- name: expose role output
-  set_fact:
-    "{{ sanitize_role_name }}":
-      server_port: "{{ server_port }}"
-      installation_folder: "{{ installation_folder }}"
-      configuration_file: "{{ installation_folder }}/conf/application.properties"
-      configuration_xml_file: "{{ installation_folder }}/conf/cloudagent.conf.xml"
-      service_plist_file_path: "{{ service_plist_file_path }}"

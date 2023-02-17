@@ -3,7 +3,9 @@
 # validation
 
 - name: assert all vars are set
-  assert: { that: "{{ item }} != '' " }
+  assert: 
+    that: "{{ item }} != '' " 
+    quiet: true
   with_items:
   - installation_root_folder
   - app_name
@@ -43,7 +45,7 @@
         force: yes
       become: yes
       when: previous_supervision.stat.exists
-
+    
   become: yes
   when: 
     - previous_exists.stat.exists
