@@ -34,6 +34,9 @@
     # in mac - plist owner is root
     owner: root
   become: yes
+
+- name: notify to start service
+  command: echo "notify to start service..."
   notify:
     - start the service
 
