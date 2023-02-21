@@ -7,6 +7,8 @@ __installer_checksum: "{{ darwin_installer_checksum }}"
 
 temp_folder: "/tmp/experitest"
 
+logs_folder: "/Library/Experitest/{{ app_name }}/logs"
+
 service_plist_file_path: "/Library/LaunchDaemons/{{ service_name }}.plist"
 
 installer_file_name: "dist-Mac-AGENT-{{ app_version }}.zip"

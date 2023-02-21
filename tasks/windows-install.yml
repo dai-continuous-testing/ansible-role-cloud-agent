@@ -12,13 +12,13 @@
   - installation_folder
   - clear_before_install
   - server_port
-  - jmx_port
   - installer_file_name
   - s3_download_url
   - launcher_file_name
   - application_properties
   - extra_java_options
   - kill_notepad
+  - logs_folder
 #  - installer_checksum
 
 # required dependencies
@@ -265,10 +265,20 @@
   with_dict: "{{ logback_properties }}"
   become: yes
 
-- name: set permissions for logs folder
+- name: make sure logs folder exists
+  win_file:
+    path: "{{ logs_folder }}"
+    state: directory
+  become: yes
+
+- name: remove existing logs folder from installation folder
   win_file:
     path: "{{ installation_folder }}\\logs"
-    state: directory
+    state: absent
+  become: yes
+
+- name: create sym link for logs folder
+  win_command: "cmd.exe /k mklink /D {{ installation_folder }}\\logs {{ logs_folder }}"
   become: yes
 
 - name: reset pairing key
@@ -413,7 +423,6 @@
   set_fact:
     "{{ sanitize_role_name }}":
       server_port: "{{ server_port }}"
-      jmx_port: "{{ jmx_port }}"
       installation_folder: "{{ installation_folder }}"
       configuration_file: "{{ installation_folder }}\\conf\\application.properties"
       configuration_xml_file: "{{ installation_folder }}\\conf\\cloudagent.conf.xml"
