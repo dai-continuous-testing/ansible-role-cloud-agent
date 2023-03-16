@@ -35,6 +35,7 @@
     owner: root
   become: yes
 
+
 - name: remove existing logs folder from installation folder
   file:
     path: "{{ installation_folder }}/logs"
