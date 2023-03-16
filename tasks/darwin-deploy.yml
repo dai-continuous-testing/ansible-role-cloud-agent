@@ -35,6 +35,13 @@
     owner: root
   become: yes
 
+
+- name: remove existing logs folder from installation folder
+  file:
+    path: "{{ installation_folder }}/logs"
+    state: absent
+  become: yes
+
 - name: create sym link for logs folder
   file:
     src: "{{ logs_folder }}"
@@ -48,7 +55,6 @@
   command: echo "notify to start service..."
   notify:
     - start the service
-
 
 # install cambrionix package
 - name: check if cambrionix api is installed on the machine
