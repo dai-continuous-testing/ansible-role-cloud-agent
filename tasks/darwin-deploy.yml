@@ -35,10 +35,11 @@
     owner: root
   become: yes
 
-- name: notify to start service
-  command: echo "notify to start service..."
-  notify:
-    - start the service
+- name: remove existing logs folder from installation folder
+  file:
+    path: "{{ installation_folder }}/logs"
+    state: absent
+  become: yes
 
 - name: create sym link for logs folder
   file:
@@ -48,6 +49,11 @@
     mode: 0777
     owner: "{{ ansible_user_id }}"
   become: yes
+
+- name: notify to start service
+  command: echo "notify to start service..."
+  notify:
+    - start the service
 
 # install cambrionix package
 - name: check if cambrionix api is installed on the machine
