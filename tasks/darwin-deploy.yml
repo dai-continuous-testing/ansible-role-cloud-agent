@@ -35,6 +35,12 @@
     owner: root
   become: yes
 
+- name: remove existing logs folder from installation folder
+  file:
+    path: "{{ installation_folder }}/logs"
+    state: absent
+  become: yes
+
 - name: create sym link for logs folder
   file:
     src: "{{ logs_folder }}"
