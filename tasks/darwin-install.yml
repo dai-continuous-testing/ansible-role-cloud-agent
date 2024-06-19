@@ -93,7 +93,7 @@
 - name: unzip the file
   unarchive:
     src: "{{ temp_folder }}/{{ installer_file_name }}"
-    dest: "{{ temp_folder }}"
+    dest: "{{ temp_folder }}/{{ (installer_file_name | splitext)[0] }}"
     remote_src: yes
     creates: "{{ temp_folder }}/{{ (installer_file_name | splitext)[0] }}/{{ convention }}"
     owner: "{{ ansible_user_id }}"
