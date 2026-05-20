@@ -67,11 +67,30 @@
   become: yes
   ignore_errors: yes
   
+- name: check if cambrionix directory exists
+  stat:
+    path: "{{ installation_folder }}/bin/cambrionix"
+  register: cmbx_dir
+
 - name: search cambrionix package
   find:
     paths: "{{ installation_folder }}/bin/cambrionix"
     patterns: '*.pkg'
   register: cmbx_installer
+  when: cmbx_dir.stat.exists
+
+- name: set empty installer list if directory doesn't exist
+  set_fact:
+    cmbx_installer:
+      files: []
+  when: not cmbx_dir.stat.exists
+
+- name: warn if cambrionix installer not found but needed
+  debug:
+    msg: "WARNING: Cambrionix is not installed and no installer package (*.pkg) found in {{ installation_folder }}/bin/cambrionix. Installation will be skipped. Please ensure the Cambrionix installer package is placed in this directory."
+  when:
+    - cbrxd_test.rc != 0
+    - cmbx_installer.files | length == 0
 
 - name: verify cambrionix version if installed
   block:
