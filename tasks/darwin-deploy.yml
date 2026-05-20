@@ -109,7 +109,9 @@
           rc: 1
       when: cbrx_inst_ver != cbrx_file_ver
 
-  when: cbrxd_test.rc == 0
+  when: 
+    - cbrxd_test.rc == 0
+    - cmbx_installer.files | length > 0
 
 
 - name: install cambrionix
@@ -133,8 +135,11 @@
       delay: 10
       become: yes
       ignore_errors: yes
+      when: installer_cbrxd.ansible_job_id is defined
 
-  when: cbrxd_test.rc != 0
+  when: 
+    - cbrxd_test.rc != 0
+    - cmbx_installer.files | length > 0
 
 # fixed xcode select
 
