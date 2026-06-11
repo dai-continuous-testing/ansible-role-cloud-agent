@@ -1,0 +1,41 @@
+---
+- name: Unload carplay user service if running
+  command: >
+    launchctl unload
+    "/Users/{{ ansible_user }}/Library/LaunchAgents/{{ carplay_service_label }}.plist"
+  become: true
+  become_user: "{{ ansible_user }}"
+  ignore_errors: true
+
+- name: Remove user LaunchAgents plist
+  file:
+    path: "/Users/{{ ansible_user }}/Library/LaunchAgents/{{ carplay_service_label }}.plist"
+    state: absent
+  become: true
+
+- name: Remove carplay start script
+  file:
+    path: "{{ carplay_installation_dir }}/carplay-start.sh"
+    state: absent
+  become: true
+
+- name: Remove carplay installation directory
+  file:
+    path: "{{ carplay_installation_dir }}/{{ carplay_service_name }}"
+    state: absent
+  become: true
+
+- name: Remove carPlayXCUITest destination directory
+  file:
+    path: "{{ carplay_xcuitest_dest_dir }}"
+    state: absent
+  become: true
+
+- name: Clean up temp directory if exists
+  file:
+    path: "{{ carplay_temp_dir }}"
+    state: absent
+
+- name: Print uninstall status
+  debug:
+    msg: "✅ CarPlay XCUITest service has been successfully uninstalled from {{ inventory_hostname }}"

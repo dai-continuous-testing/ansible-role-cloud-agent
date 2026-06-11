@@ -1,0 +1,151 @@
+---
+
+# - name: Enable automation mode without authentication
+#   command: automationmodetool enable-automationmode-without-authentication
+#   become: true
+#   become_user: root
+
+- name: Ensure carplay service directory exists
+  file:
+    path: "{{ carplay_installation_dir }}"
+    state: directory
+    mode: "0755"
+  become: true
+
+- name: Ensure temp directory exists
+  file:
+    path: "{{ carplay_temp_dir }}"
+    state: directory
+    mode: "0755"
+
+- name: Ensure JRE has execute permissions
+  file:
+    path: "{{ java_installation_folder }}"
+    mode: "0755"
+    owner: "{{ ansible_user }}"
+    group: admin
+    recurse: true
+  become: true
+
+- name: validate checksum and download zip from s3 url
+  get_url:
+    url: "{{ carplay_s3_download_url }}"
+    dest: "{{ carplay_temp_dir }}/{{ carplay_zip_name }}"
+    timeout: "{{ download_timeout | default(60) }}"
+  when: carplay_custom_download_url == ""
+
+- name: validate checksum and download zip from custom url
+  get_url:
+    url: "{{ carplay_custom_download_url }}"
+    dest: "{{ carplay_temp_dir }}/{{ carplay_zip_name }}"
+    timeout: "{{ download_timeout | default(60) }}"
+  when: carplay_custom_download_url != ""
+
+- name: Unzip carplay-xcuitest-service archive
+  unarchive:
+    src: "{{ carplay_temp_dir }}/{{ carplay_zip_name }}"
+    dest: "{{ carplay_temp_dir }}"
+    remote_src: yes
+
+- name: Copy carplay-xcuitest-service files to installation directory
+  copy:
+    src: "{{ carplay_temp_dir }}/{{ carplay_service_name }}"
+    dest: "{{ carplay_installation_dir }}/"
+    mode: "0755"
+    remote_src: yes
+  become: true
+
+- name: Ensure carPlayXCUITest destination directory exists
+  file:
+    path: "{{ carplay_xcuitest_dest_dir }}"
+    state: directory
+    mode: "0755"
+  become: true
+
+- name: Copy carPlayXCUITest folder from {{ installation_folder }}/bin/appium to carplay service directory
+  copy:
+    src: "{{ installation_folder }}/bin/appium/carPlayXCUITest"
+    dest: "{{ carplay_xcuitest_dest_dir }}"
+    remote_src: yes
+    mode: "0755"
+  become: true
+
+- name: Ensure user LaunchAgents directory exists
+  file:
+    path: "/Users/{{ ansible_user }}/Library/LaunchAgents"
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: admin
+    mode: "0755"
+  become: true
+
+- name: Deploy carplay start script
+  template:
+    src: carplay-start.sh.j2
+    dest: "{{ carplay_installation_dir }}/carplay-start.sh"
+    owner: "{{ ansible_user }}"
+    group: admin
+    mode: "0755"
+  become: true
+
+- name: Deploy carplay xcuitest plist to user LaunchAgents
+  template:
+    src: carplay.plist.j2
+    dest: "/Users/{{ ansible_user }}/Library/LaunchAgents/{{ carplay_service_label }}.plist"
+    owner: "{{ ansible_user }}"
+    group: admin
+    mode: "0644"
+  become: true
+
+- name: Unload carplay service if running
+  command: >
+    launchctl unload
+    "/Users/{{ ansible_user }}/Library/LaunchAgents/{{ carplay_service_label }}.plist"
+  become: true
+  become_user: "{{ ansible_user }}"
+  ignore_errors: true
+
+- name: Load carplay service as user
+  command: >
+    launchctl load -w
+    "/Users/{{ ansible_user }}/Library/LaunchAgents/{{ carplay_service_label }}.plist"
+  become: true
+  become_user: "{{ ansible_user }}"
+
+- name: Clean up temp directory
+  file:
+    path: "{{ carplay_temp_dir }}"
+    state: absent
+  when: carplay_cleanup_temp | default(true) | bool
+
+- name: Wait for carplay service to start on port {{ carplay_service_port }}
+  wait_for:
+    port: "{{ carplay_service_port }}"
+    host: "127.0.0.1"
+    delay: 5
+    timeout: 60
+    state: started
+  register: carplay_port_check
+  ignore_errors: yes
+
+- name: Verify carplay service port is listening
+  shell: "lsof -iTCP:{{ carplay_service_port }} -sTCP:LISTEN | grep -c LISTEN"
+  register: carplay_port_listen
+  changed_when: false
+  ignore_errors: yes
+
+- name: Print carplay service status
+  debug:
+    msg: >-
+      {% if carplay_port_check is success and carplay_port_listen.stdout | int > 0 %}
+      ✅ CarPlay XCUITest service is UP and listening on port {{ carplay_service_port }}
+      {% else %}
+      ❌ CarPlay XCUITest service FAILED to start on port {{ carplay_service_port }} - check logs at {{ installation_folder }}/Agent/logs/xcuitest-runner-errors.log
+      {% endif %}
+
+- name: Fail if carplay service is not running
+  fail:
+    msg: "CarPlay XCUITest service did not start within timeout. Port {{ carplay_service_port }} is not listening."
+  when:
+    - carplay_port_check is failed or carplay_port_listen.stdout | int == 0
+    - carplay_fail_on_health_check | default(true) | bool

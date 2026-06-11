@@ -27,3 +27,20 @@ java_bin: "{{ java_installation_folder }}/jdk{{ java_version }}-jre/Contents/Hom
 
 __custom_download_username: "myuser"
 __custom_download_password: "mypassword"
+
+carplay_custom_download_url: ""
+
+carplay_temp_dir: "/tmp/carplay-xcuitest-service"
+carplay_zip_name: "dist-MAC-CARPLAY-SERVICE-{{ app_version }}.zip"
+carplay_installation_dir: "{{ installation_folder }}"
+carplay_lib_dir: "{{ carplay_installation_dir }}/lib"
+carplay_xcuitest_dest_dir: "/Users/Shared/carplay-xcuitest-service"
+
+carplay_service_label: "com.experitest.carplay.xcuitest.service"
+carplay_plist_dest: "/Library/LaunchDaemons/{{ carplay_service_label }}.plist"
+
+carplay_service_class: "com.experitest.carplay.xcuitest.impl.CarPlayXCUITestApplication"
+
+carplay_service_name: "carplay-xcuitest-service"
+
+carplay_service_port: 9726

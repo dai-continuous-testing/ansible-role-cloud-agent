@@ -33,7 +33,9 @@ Role Variables
 | clear_before_install | removing old installation before installing new version | boolean | False | no |
 | kill_notepad | kill notepad/notepadd++ apps on windows | boolean | False | no |
 | maintain_supervision_files | maintain supervision files between installations | boolean | False | no |
-| download | only download the release version | boolean | True | no || deploy | only deploy the release version | boolean | True | no |
+| download | only download the release version | boolean | True | no |
+| deploy | only deploy the release version | boolean | True | no |
+| carplay_deploy | deploy carplay service | boolean | false | no |
 Example Playbook
 ----------------
 

@@ -15,6 +15,13 @@
     - state|default('present') == 'present'
     - deploy | default('true') | bool
 
+- name : Deploy carplay-xcuitest-service
+  include_tasks: "tasks/{{ ansible_os_family | os_family_to_os_type }}-carplay-install.yml"
+  when:
+    - state|default('present') == 'present'
+    - deploy | default('true') | bool
+    - carplay_deploy | default('false') | bool
+
 - name: track versions
   include_tasks: "tasks/{{ ansible_os_family | os_family_to_os_type }}-track-versions.yml"
   when: 
@@ -42,6 +49,10 @@
 
 - name: uninstall
   include_tasks: "tasks/{{ ansible_os_family | os_family_to_os_type }}-uninstall.yml"
+  when: state|default('present') == 'absent'
+
+- name: uninstall carplay-xcuitest-service
+  include_tasks: "tasks/{{ ansible_os_family | os_family_to_os_type }}-carplay-uninstall.yml"
   when: state|default('present') == 'absent'
 
 - name: set-facts for next steps
