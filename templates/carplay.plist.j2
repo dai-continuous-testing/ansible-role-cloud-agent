@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>{{ carplay_service_label }}</string>
+
+    <key>UserName</key>
+    <string>{{ ansible_user }}</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>{{ carplay_installation_dir }}/carplay-start.sh</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>{{ carplay_installation_dir }}/{{ carplay_service_name }}</string>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>KeepAlive</key>
+    <true/>
+
+    <key>StandardErrorPath</key>
+    <string>{{ installation_folder }}/logs/xcuitest-runner-errors.log</string>
+
+    <key>StandardOutPath</key>
+    <string>{{ installation_folder }}/logs/xcuitest-runner.log</string>
+</dict>
+</plist>

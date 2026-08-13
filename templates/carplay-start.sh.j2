@@ -1,0 +1,14 @@
+#!/bin/bash
+# Managed by Ansible - Do not edit manually
+# CarPlay XCUITest Service Start Script
+
+set -e
+
+export JAVA_HOME="{{ carplay_java_bin | dirname | dirname }}"
+export PATH="{{ carplay_java_bin | dirname }}:/usr/local/bin:/usr/bin:/bin"
+
+cd "{{ carplay_installation_dir }}/{{ carplay_service_name }}"
+
+exec "{{ carplay_java_bin }}" \
+  -cp "lib/*" \
+  {{ carplay_service_class }}
