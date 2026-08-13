@@ -1,0 +1,50 @@
+---
+# CarPlay XCUITest service — uninstall (macOS only). Merged from ansible-role-carplay (SA-61481).
+
+- name: Unload carplay user service if running
+  command: >
+    launchctl unload
+    "/Users/{{ ansible_user }}/Library/LaunchAgents/{{ carplay_service_label }}.plist"
+  become: true
+  become_user: "{{ ansible_user }}"
+  ignore_errors: true
+
+- name: Unload carplay system-wide service if running
+  command: >
+    launchctl unload
+    "/Library/LaunchAgents/{{ carplay_service_label }}.plist"
+  become: true
+  ignore_errors: true
+
+- name: Remove user LaunchAgents plist
+  file:
+    path: "/Users/{{ ansible_user }}/Library/LaunchAgents/{{ carplay_service_label }}.plist"
+    state: absent
+  become: true
+
+- name: Remove system-wide LaunchAgents plist if exists
+  file:
+    path: "/Library/LaunchAgents/{{ carplay_service_label }}.plist"
+    state: absent
+  become: true
+
+- name: Remove carplay start script
+  file:
+    path: "{{ carplay_installation_dir }}/carplay-start.sh"
+    state: absent
+  become: true
+
+- name: Remove carPlayXCUITest destination directory
+  file:
+    path: "{{ carplay_xcuitest_dest_dir }}"
+    state: absent
+  become: true
+
+- name: Clean up carplay temp directory if exists
+  file:
+    path: "{{ carplay_temp_dir }}"
+    state: absent
+
+- name: Print carplay uninstall status
+  debug:
+    msg: "CarPlay XCUITest service has been successfully uninstalled from {{ inventory_hostname }}"

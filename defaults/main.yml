@@ -106,3 +106,36 @@ cdn_name: "devops-artifacts.experitest.com"
 s3_download_url: "https://{{ cdn_name }}/{{ relative_path }}/{{ installer_file_name }}"
 
 java_download_url: "https://{{ cdn_name }}/{{ java_relative_path }}/{{ java_download_filename }}"
+
+# ---------------------------------------------------------------------------
+# CarPlay XCUITest service (macOS only) — merged from ansible-role-carplay (SA-61481).
+# Deployed by this role only when carplay_service_enabled is true (darwin hosts).
+# Per-environment download behavior is preserved via carplay_custom_download_url:
+#   - dev  passes a link_finder/TeamCity URL as carplay_custom_download_url
+#   - prod leaves it empty -> falls back to carplay_s3_download_url (S3/CDN)
+# ---------------------------------------------------------------------------
+carplay_service_enabled: false
+
+# Defaults to the agent's __app_version; override carplay_version in inventory to pin it.
+carplay_version: "{{ __app_version }}"
+carplay_custom_download_url: ""
+
+carplay_temp_dir: "/tmp/carplay-xcuitest-service"
+carplay_zip_name: "dist-MAC-CARPLAY-SERVICE-{{ carplay_version }}.zip"
+carplay_installation_dir: "{{ installation_folder }}"
+carplay_xcuitest_dest_dir: "/Users/Shared/carplay-xcuitest-service"
+
+carplay_service_name: "carplay-xcuitest-service"
+carplay_service_label: "com.experitest.carplay.xcuitest.service"
+carplay_service_class: "com.experitest.carplay.xcuitest.impl.CarPlayXCUITestApplication"
+carplay_service_port: 9726
+
+carplay_relative_path: "carplay-service/osx"
+carplay_s3_download_url: "https://{{ cdn_name }}/{{ carplay_relative_path }}/{{ carplay_zip_name }}"
+
+# CarPlay runs on the same JRE this role installs for the agent by default.
+# Override carplay_java_bin if CarPlay needs a pinned/separate JRE.
+carplay_java_bin: "{{ java_bin }}"
+
+carplay_cleanup_temp: true
+carplay_fail_on_health_check: true
