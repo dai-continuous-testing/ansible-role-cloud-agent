@@ -122,6 +122,18 @@
   become_user: "{{ ansible_user }}"
   ignore_errors: true
 
+- name: Ensure carplay runner log files exist and are writable by the service user
+  file:
+    path: "{{ installation_folder }}/logs/{{ item }}"
+    state: touch
+    owner: "{{ ansible_user }}"
+    group: admin
+    mode: "0644"
+  loop:
+    - xcuitest-runner.log
+    - xcuitest-runner-errors.log
+  become: true
+
 - name: Load carplay service as user
   command: >
     launchctl load -w
