@@ -34,6 +34,12 @@ Role Variables
 | kill_notepad | kill notepad/notepadd++ apps on windows | boolean | False | no |
 | maintain_supervision_files | maintain supervision files between installations | boolean | False | no |
 | download | only download the release version | boolean | True | no || deploy | only deploy the release version | boolean | True | no |
+| carplay_service_enabled | deploy the CarPlay XCUITest service (macOS only, opt-in). cloud.agent.useXCUITestForCarPlay=true should be added in cloudagent application.properties | boolean | False | no |
+| carplay_version | CarPlay service version to install | string | tracks `app_version` | no |
+| carplay_custom_download_url | url to download the CarPlay service zip; leave empty to use the S3/CDN default | string |  | no |
+| carplay_service_port | port the CarPlay XCUITest service listens on | number | 9726 | no |
+| carplay_java_bin | java binary used to run the CarPlay service | string | the agent's JRE (`java_bin`) | no |
+
 Example Playbook
 ----------------
 
