@@ -39,36 +39,3 @@ Role Variables
 | carplay_custom_download_url | url to download the CarPlay service zip; leave empty to use the S3/CDN default | string |  | no |
 | carplay_service_port | port the CarPlay XCUITest service listens on | number | 9726 | no |
 | carplay_java_bin | java binary used to run the CarPlay service | string | the agent's JRE (`java_bin`) | no |
-
-CarPlay XCUITest service
-------------------------
-
-The role can also deploy the **CarPlay XCUITest service** (macOS only). It is **opt-in and disabled by default** — set `carplay_service_enabled: true` to install it. When enabled, the role installs the service after the agent is deployed and runs it as a per-user `LaunchAgent` on port `9726`, using the agent's JRE.
-
-The download source is chosen automatically from `carplay_custom_download_url`:
-
-* **empty (default)** → download from the S3/CDN release location. Use this in production.
-* **set** → download from the given url (e.g. a TeamCity build resolved via `link_finder`). Use this in dev.
-
-**Enable with the S3/CDN release (prod):**
-
-```yaml
-- role: cloud-agent
-  carplay_service_enabled: true
-```
-
-**Enable with a custom/TeamCity build (dev):**
-
-```yaml
-- role: cloud-agent
-  carplay_service_enabled: true
-  carplay_custom_download_url: "{{ carplay_lf.download_url }}"
-  carplay_version: "{{ carplay_lf.app_version }}"
-```
-
-To remove it, run the role with `state: absent` and `carplay_service_enabled: true`.
-
-Example Playbook
-----------------
-
-#### [see working example](/example)
