@@ -39,3 +39,8 @@ Role Variables
 | carplay_custom_download_url | url to download the CarPlay service zip; leave empty to use the S3/CDN default | string |  | no |
 | carplay_service_port | port the CarPlay XCUITest service listens on | number | 9726 | no |
 | carplay_java_bin | java binary used to run the CarPlay service | string | the agent's JRE (`java_bin`) | no |
+
+Example Playbook
+----------------
+
+#### [see working example](/example)
