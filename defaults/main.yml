@@ -117,7 +117,7 @@ java_download_url: "https://{{ cdn_name }}/{{ java_relative_path }}/{{ java_down
 carplay_service_enabled: false
 
 # Defaults to the agent's __app_version; override carplay_version in inventory to pin it.
-carplay_version: "{{ __app_version }}"
+carplay_version: "{{ app_version }}"
 carplay_custom_download_url: ""
 
 carplay_temp_dir: "/tmp/carplay-xcuitest-service"
