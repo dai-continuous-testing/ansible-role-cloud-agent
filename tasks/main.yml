@@ -22,6 +22,7 @@
     - deploy | default('true') | bool
     - carplay_service_enabled | default(false) | bool
     - (ansible_os_family | os_family_to_os_type) == 'darwin'
+    - ansible_architecture == 'arm64'
 
 - name: track versions
   include_tasks: "tasks/{{ ansible_os_family | os_family_to_os_type }}-track-versions.yml"
@@ -54,6 +55,7 @@
     - state|default('present') == 'absent'
     - carplay_service_enabled | default(false) | bool
     - (ansible_os_family | os_family_to_os_type) == 'darwin'
+    - ansible_architecture == 'arm64'
 
 - name: uninstall
   include_tasks: "tasks/{{ ansible_os_family | os_family_to_os_type }}-uninstall.yml"
