@@ -139,3 +139,28 @@ carplay_java_bin: "{{ java_bin }}"
 
 carplay_cleanup_temp: true
 carplay_fail_on_health_check: true
+
+# ---------------------------------------------------------------------------
+# Rosetta 2 / x86_64 Java workaround (macOS Apple Silicon only, opt-in).
+# Temporary workaround for native library dependencies (e.g. Xuggler) that are
+# not compatible with arm64. When enabled, the agent is launched through
+# Rosetta 2 (`arch -x86_64`) using an x86_64 JDK instead of the native arm64
+# JRE. This must be enabled per-customer via feature flag, only for hosts
+# where the workaround has been validated.
+#
+# Prerequisites (not managed by this role, must be done on the host first):
+#   1. Install Rosetta 2 (`softwareupdate --install-rosetta --agree-to-license`)
+#   2. Install an x86_64 JDK (e.g. Java 17.0.2, Mac/x64) at rosetta_java_bin
+#
+# NOTE: Rosetta 2 is being phased out by Apple - macOS 27 (Golden Gate) is the
+# last release with full Rosetta support, and macOS 28 (Fall 2027) removes it
+# for all but a small set of legacy games. This is a stopgap only.
+# Permanent fix tracked in SA-60348 (replace Xuggler with an ARM64-compatible
+# video library).
+# ---------------------------------------------------------------------------
+rosetta_x86_java_enabled: false
+
+# Only apply the Rosetta workaround on Apple Silicon hosts, and only when explicitly enabled.
+rosetta_active: "{{ rosetta_x86_java_enabled | bool and ansible_architecture == 'arm64' }}"
+
+cmd_prefix: "{{ 'exec arch -x86_64' if rosetta_active else '' }}"
