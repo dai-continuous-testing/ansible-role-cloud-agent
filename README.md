@@ -34,6 +34,9 @@ Role Variables
 | kill_notepad | kill notepad/notepadd++ apps on windows | boolean | False | no |
 | maintain_supervision_files | maintain supervision files between installations | boolean | False | no |
 | download | only download the release version | boolean | True | no || deploy | only deploy the release version | boolean | True | no |
+| rosetta_x86_java_enabled | temporary workaround (macOS Apple Silicon only, opt-in per customer): launch the agent under Rosetta 2 (`arch -x86_64`) using an x86_64 JDK instead of the native arm64 JRE, to work around native libs (e.g. Xuggler) incompatible with arm64. Rosetta 2 and the x86_64 JDK at `rosetta_java_bin` must already be installed on the host - this role does not install them. Permanent fix tracked in SA-60348 | boolean | False | no |
+| rosetta_java_bin | path to the x86_64 JDK used when `rosetta_x86_java_enabled` is true | string | `{{ installation_root_folder }}/jre/jdk-17.0.2.jdk/Contents/Home/bin/java` | no |
+
 Example Playbook
 ----------------
 
