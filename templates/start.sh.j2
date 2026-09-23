@@ -7,7 +7,7 @@ export SYSTEM_VERSION_COMPAT=0
 # JAVA_PATH=$(/usr/libexec/java_home -v 1.8)
 JAVA_BIN={{ java_bin }}
 
-{{ cmd_prefix }} $JAVA_BIN -cp ".:lib/*" \
+$JAVA_BIN -cp ".:lib/*" \
     -Xmx2048m \
     -XX:+HeapDumpOnOutOfMemoryError \
     -XX:HeapDumpPath=./logs \

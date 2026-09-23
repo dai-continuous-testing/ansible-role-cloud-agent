@@ -48,18 +48,6 @@
     msg: "java must be accesible in path {{ java_bin }}"
   when: java_test.rc != 0
 
-- name: make sure rosetta 2 is installed on the machine (required for rosetta_x86_java_enabled)
-  command: "/usr/bin/pgrep -q oahd"
-  register: rosetta_test
-  become: yes
-  ignore_errors: yes
-  when: rosetta_active
-
-- name: fail if rosetta 2 is not installed
-  fail:
-    msg: "rosetta_x86_java_enabled is true but Rosetta 2 is not installed on this host. Install it first with: softwareupdate --install-rosetta --agree-to-license"
-  when: rosetta_active and rosetta_test.rc != 0
-
 # download the file
 
 - name: validate checksum and download zip from s3 url
