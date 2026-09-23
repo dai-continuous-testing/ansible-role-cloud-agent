@@ -21,8 +21,7 @@ java_download_filename: "OpenJDK8U-jre_x64_mac_hotspot_{{ java_version }}.tar.gz
 
 java_relative_path: "java/osx"
 
-# Kept outside installation_root_folder so re-installs/upgrades don't wipe out the JRE.
-java_installation_folder: "/usr/local/share/experitest"
+java_installation_folder: "{{ installation_root_folder }}/jre"
 
 java_bin: "{{ java_installation_folder }}/jdk{{ java_version }}-jre/Contents/Home/bin/java"
 
