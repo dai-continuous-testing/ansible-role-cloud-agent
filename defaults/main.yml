@@ -115,9 +115,9 @@ java_download_url: "https://{{ cdn_name }}/{{ java_relative_path }}/{{ java_down
 # JRE. This must be enabled per-customer via feature flag, only for hosts
 # where the workaround has been validated.
 #
-# Prerequisites (not managed by this role, must be done on the host first):
+# Prerequisite (not managed by this role, must be done on the host first):
 #   1. Install Rosetta 2 (`softwareupdate --install-rosetta --agree-to-license`)
-#   2. Install an x86_64 JDK (e.g. Java 17.0.2, Mac/x64) at rosetta_java_bin
+# The x86_64 JDK itself is downloaded and installed by this role (see below).
 #
 # NOTE: Rosetta 2 is being phased out by Apple - macOS 27 (Golden Gate) is the
 # last release with full Rosetta support, and macOS 28 (Fall 2027) removes it
@@ -131,3 +131,15 @@ rosetta_x86_java_enabled: false
 rosetta_active: "{{ rosetta_x86_java_enabled | bool and ansible_architecture == 'arm64' }}"
 
 cmd_prefix: "{{ 'exec arch -x86_64' if rosetta_active else '' }}"
+
+# x86_64 JDK downloaded for the Rosetta workaround (Xuggler and other native libs need a real x86_64 JVM).
+rosetta_java_version: "25.0.4_7"
+rosetta_java_major_version: "{{ rosetta_java_version.split('.')[0] }}"
+rosetta_java_relative_path: "java/osx"
+rosetta_java_download_filename: "OpenJDK{{ rosetta_java_major_version }}U-jre_x64_mac_hotspot_{{ rosetta_java_version }}.tar.gz"
+rosetta_java_download_url: "https://{{ cdn_name }}/{{ rosetta_java_relative_path }}/{{ rosetta_java_download_filename }}"
+rosetta_java_installation_folder: "{{ installation_root_folder }}/jre-x86_64"
+rosetta_java_bin: "{{ rosetta_java_installation_folder }}/jdk{{ rosetta_java_version }}-jre/Contents/Home/bin/java"
+
+# Binary actually used to launch the agent, x86_64 JDK when the Rosetta workaround is active.
+effective_java_bin: "{{ rosetta_java_bin if rosetta_active else java_bin }}"

@@ -37,6 +37,16 @@
 
 # required java dependency
 
+- name: check java installation folder exists
+  stat:
+    path: "{{ java_installation_folder }}"
+  register: java_installation_folder_stat
+
+- name: fail if java installation folder is missing
+  fail:
+    msg: "java installation folder not found at {{ java_installation_folder }}"
+  when: not java_installation_folder_stat.stat.exists or not java_installation_folder_stat.stat.isdir
+
 - name: make sure java is installed on the machine
   command: "{{ java_bin }} -version"
   register: java_test
@@ -59,6 +69,40 @@
   fail:
     msg: "rosetta_x86_java_enabled is true but Rosetta 2 is not installed on this host. Install it first with: softwareupdate --install-rosetta --agree-to-license"
   when: rosetta_active and rosetta_test.rc != 0
+
+- name: make sure x86_64 JDK installation folder exists (rosetta)
+  file:
+    path: "{{ rosetta_java_installation_folder }}"
+    state: directory
+    owner: "{{ ansible_user_id }}"
+  become: yes
+  when: rosetta_active
+
+- name: download x86_64 JDK for rosetta workaround
+  get_url:
+    url: "{{ rosetta_java_download_url }}"
+    dest: "{{ temp_folder }}/{{ rosetta_java_download_filename }}"
+    timeout: "{{ download_timeout | default(60) }}"
+  when: rosetta_active
+
+- name: unpack x86_64 JDK for rosetta workaround
+  command: "tar -xzf {{ temp_folder }}/{{ rosetta_java_download_filename }} -C {{ rosetta_java_installation_folder }}"
+  args:
+    creates: "{{ rosetta_java_bin }}"
+  become: yes
+  when: rosetta_active
+
+- name: make sure x86_64 java is usable (rosetta)
+  command: "{{ rosetta_java_bin }} -version"
+  register: rosetta_java_test
+  become: yes
+  ignore_errors: yes
+  when: rosetta_active
+
+- name: fail if x86_64 java is not usable
+  fail:
+    msg: "rosetta_x86_java_enabled is true but the downloaded x86_64 JDK at {{ rosetta_java_bin }} is not usable"
+  when: rosetta_active and rosetta_java_test.rc != 0
 
 # download the file
 
