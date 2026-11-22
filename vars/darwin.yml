@@ -28,5 +28,3 @@ java_bin: "{{ java_installation_folder }}/jdk{{ java_version }}-jre/Contents/Hom
 __custom_download_username: "myuser"
 __custom_download_password: "mypassword"
 
-# CVE-2026-114938 (Java4Shell): macOS uses the fixed Temurin build.
-__java_version: "25.0.5.1_2"
