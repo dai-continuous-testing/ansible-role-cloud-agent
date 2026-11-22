@@ -27,3 +27,4 @@ java_bin: "{{ java_installation_folder }}/jdk{{ java_version }}-jre/Contents/Hom
 
 __custom_download_username: "myuser"
 __custom_download_password: "mypassword"
+
